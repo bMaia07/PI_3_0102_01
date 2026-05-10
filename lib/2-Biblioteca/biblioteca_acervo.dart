@@ -85,7 +85,7 @@ class _BibliotecaAcervoScreenState extends State<BibliotecaAcervoScreen> {
                 ),
                 const SizedBox(height: 14),
                 Image.asset(
-                  'assets/biblioteca/livro_segredo_animais_pedaco_$numero.png',
+                  'assets/fundo/Biblioteca/livro_segredo_animais_pedaco_$numero.png',
                   width: 130,
                   filterQuality: FilterQuality.none,
                   isAntiAlias: false,
@@ -195,7 +195,7 @@ class _BibliotecaAcervoScreenState extends State<BibliotecaAcervoScreen> {
   @override
   Widget build(BuildContext context) {
     return BibliotecaSceneScaffold(
-      imageAsset: 'assets/biblioteca/biblioteca_acervo.png',
+      imageAsset: 'assets/fundo/Biblioteca/biblioteca_acervo.png',
       titulo: '',
       descricao: '',
       dicaRodape: '',
@@ -470,7 +470,7 @@ class _PuzzleLivroDialogState extends State<_PuzzleLivroDialog> {
   // Slots do tabuleiro; null significa que aquele espaço ainda está vazio.
   final List<int?> _slots = <int?>[null, null, null, null];
 
-  String _assetPeca(int numero) => 'assets/biblioteca/livro_segredo_animais_pedaco_$numero.png';
+  String _assetPeca(int numero) => 'assets/fundo/Biblioteca/livro_segredo_animais_pedaco_$numero.png';
 
   // A ordem correta é: 1, 2, 3, 4.
   // Quando todos os slots batem com essa ordem, o livro é considerado encontrado.

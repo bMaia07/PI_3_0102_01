@@ -21,7 +21,7 @@ class BibliotecaFachadaScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Retorna a tela base da biblioteca com imagem de fundo e elementos sobrepostos.
     return BibliotecaSceneScaffold(
-      imageAsset: 'assets/biblioteca/biblioteca_fachada.png',
+      imageAsset: 'assets/fundo/Biblioteca/biblioteca_fachada.png',
       titulo: 'BIBLIOTECA - FACHADA',
       descricao:
           'Você chegou à entrada da biblioteca.\nClique no marcador da rampa para entrar no prédio.',

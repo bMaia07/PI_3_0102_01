@@ -21,7 +21,7 @@ class BibliotecaHallScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Retorna a tela base da biblioteca com imagem de fundo e elementos sobrepostos.
     return BibliotecaSceneScaffold(
-      imageAsset: 'assets/biblioteca/biblioteca_hall.png',
+      imageAsset: 'assets/fundo/Biblioteca/biblioteca_hall.png',
       titulo: 'BIBLIOTECA - HALL',
       descricao:
           'Você está no hall da biblioteca.\nClique no marcador para seguir para a área principal.',

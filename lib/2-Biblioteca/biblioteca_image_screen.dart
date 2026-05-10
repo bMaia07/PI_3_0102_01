@@ -26,7 +26,7 @@ class BibliotecaAudioController {
     await _player.setReleaseMode(ReleaseMode.loop);
     await _player.setVolume(mutado ? 0.0 : 1.0);
     // Toca o arquivo de áudio cadastrado nos assets do Flutter.
-    await _player.play(AssetSource('audio/audio_biblioteca.mp3'));
+    await _player.play(AssetSource('audios/audio_biblioteca.mp3'));
     _tocando = true;
   }
 

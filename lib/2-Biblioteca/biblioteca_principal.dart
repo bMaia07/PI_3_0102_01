@@ -72,7 +72,7 @@ class _BibliotecaPrincipalScreenState extends State<BibliotecaPrincipalScreen> {
   @override
   Widget build(BuildContext context) {
     return BibliotecaSceneScaffold(
-      imageAsset: 'assets/biblioteca/biblioteca_principal.png',
+      imageAsset: 'assets/fundo/Biblioteca/biblioteca_principal.png',
       titulo: '',
       descricao: '',
       dicaRodape: '',
