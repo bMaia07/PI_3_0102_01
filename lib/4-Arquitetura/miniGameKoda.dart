@@ -170,7 +170,7 @@ class _MiniGameKodaState extends State<MiniGameKoda> {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                  'assets/fundo/Arquitetura/sala-arq-pxl.jpg',
+                  'assets/fundo/Arquitetura/sala-arq-pxl.png',
                 ),
                 fit: BoxFit.cover,
               ),
@@ -269,7 +269,7 @@ class _MiniGameKodaState extends State<MiniGameKoda> {
                           borderRadius:
                               BorderRadius.circular(4),
                           child: Image.asset(
-                            'assets/minigame/casa_piece_${index + 1}.png',
+                            'assets/fundo/Arquitetura/puzzle_arq${index + 1}.png',
                             fit: BoxFit.cover,
                           ),
                         ),
