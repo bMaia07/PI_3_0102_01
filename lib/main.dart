@@ -7,7 +7,7 @@ import '../1-H15/tela_h15.dart';
 import '../4-Arquitetura/arquiteturaOUT.dart';
 import 'tela_mapa_exploracao.dart';
 import 'tela_mapa_biblioteca.dart';
-import '../5-Manacas/entradaManacas.dart';
+import '../5-Manacas/entrada_manacas.dart';
 import '3-Praça/pracaalimentacao.dart';
 import '../2-Biblioteca/biblioteca_fachada.dart';
 
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         // Rota chamada quando o jogador finalmente entra no ambiente da biblioteca.
         '/biblioteca': (context) => BibliotecaFachadaScreen(),
         '/refeitorio': (context) => Telapracaalimentacao(),
-        '/manacas': (context) => EntradaScreen(),
+        '/manacas': (context) => EntradaManacasScreen(),
       },
     );
   }
