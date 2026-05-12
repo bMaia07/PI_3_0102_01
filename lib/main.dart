@@ -8,7 +8,7 @@ import '../4-Arquitetura/arquiteturaOUT.dart';
 import 'tela_mapa_exploracao.dart';
 import 'tela_mapa_biblioteca.dart';
 import '../5-Manacas/entradaManacas.dart';
-import '3-Praça/pracaalimentacao.dart';
+import '3-Praca/pracaalimentacao.dart';
 import '../2-Biblioteca/biblioteca_fachada.dart';
 
 void main() async {

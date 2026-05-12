@@ -545,7 +545,7 @@ class _TelapracaalimentacaoState
 
           Positioned.fill(
             child: Image.asset(
-              'assets/fundo/Praça/pracaalimentacao.jpeg',
+              'assets/fundo/Praca/pracaalimentacao.jpeg',
               fit: BoxFit.cover,
             ),
           ),
