@@ -48,13 +48,13 @@ class _CorredorManacasScreenState extends State<CorredorManacasScreen> {
               child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Color(0xFF1a1f3a),
-                  border: Border.all(color: Colors.cyanAccent, width: 2),
+                  color: Color.fromRGBO(38, 23, 23, 1),
+                  border: Border.all(color: const Color.fromRGBO(65, 26, 26, 1), width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   isMuted ? Icons.volume_off : Icons.volume_up,
-                  color: Colors.cyanAccent,
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   size: 24,
                 ),
               ),
@@ -70,19 +70,19 @@ class _CorredorManacasScreenState extends State<CorredorManacasScreen> {
               child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Color(0xFF1a1f3a),
-                  border: Border.all(color: Colors.cyanAccent, width: 2),
+                  color: Color.fromRGBO(38, 23, 23, 1),
+                  border: Border.all(color: const Color.fromRGBO(65, 26, 26, 1), width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.arrow_back, color: Colors.cyanAccent, size: 18),
+                    Icon(Icons.arrow_back, color: const Color.fromRGBO(65, 26, 26, 1), size: 18),
                     SizedBox(width: 6),
                     Text('VOLTAR',
                         style: TextStyle(
                             fontFamily: 'PixelifySans',
                             fontSize: 12,
-                            color: Colors.cyanAccent)),
+                            color: const Color.fromARGB(255, 255, 255, 255))),
                   ],
                 ),
               ),
@@ -91,8 +91,8 @@ class _CorredorManacasScreenState extends State<CorredorManacasScreen> {
 
           // Pegadas para a sala principal
           Positioned(
-            bottom: 80,
-            right: 50,
+            bottom: 60,
+            left: 400,
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -103,8 +103,8 @@ class _CorredorManacasScreenState extends State<CorredorManacasScreen> {
               },
               child: Image.asset(
                 'assets/fundo/Manacas/pegadas.png',
-                width: 120,
-                height: 80,
+                width: 170,
+                height: 130,
               ),
             ),
           ),

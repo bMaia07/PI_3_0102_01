@@ -81,7 +81,7 @@ class _TelaArquiteturaINState
           "Claro! O que está acontecendo?",
       personagem: "Jogador",
       imagem:
-          "assets/personagens/player-masc.png",
+          "",
     ),
 
     Dialogo(

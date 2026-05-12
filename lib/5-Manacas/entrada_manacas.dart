@@ -88,13 +88,13 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
               child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Color(0xFF1a1f3a),
-                  border: Border.all(color: Colors.cyanAccent, width: 2),
+                  color: Color.fromRGBO(38, 23, 23, 1),
+                  border: Border.all(color: const Color.fromRGBO(65, 26, 26, 1), width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   isMuted ? Icons.volume_off : Icons.volume_up,
-                  color: Colors.cyanAccent,
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   size: 24,
                 ),
               ),
@@ -113,19 +113,19 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
               child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Color(0xFF1a1f3a),
-                  border: Border.all(color: Colors.cyanAccent, width: 2),
+                  color: Color.fromRGBO(38, 23, 23, 1),
+                  border: Border.all(color: const Color.fromRGBO(65, 26, 26, 1), width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.arrow_back, color: Colors.cyanAccent, size: 18),
+                    Icon(Icons.arrow_back, color: const Color.fromRGBO(65, 26, 26, 1), size: 18),
                     SizedBox(width: 6),
                     Text('VOLTAR',
                         style: TextStyle(
                             fontFamily: 'PixelifySans',
                             fontSize: 12,
-                            color: Colors.cyanAccent)),
+                            color: const Color.fromARGB(255, 255, 255, 255))),
                   ],
                 ),
               ),
@@ -134,8 +134,8 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
 
           // Pegadas para avançar
           Positioned(
-            bottom: 150,
-            right: 90,
+            bottom: 200,
+            right: 650,
             child: GestureDetector(
               onTap: () async {
                 // Garante que a música esteja tocando
@@ -148,8 +148,8 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
               },
               child: Image.asset(
                 'assets/fundo/Manacas/pegadas.png',
-                width: 120,
-                height: 80,
+                width: 170,
+                height: 130,
               ),
             ),
           ),
