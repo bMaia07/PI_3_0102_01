@@ -1,11 +1,6 @@
 // -----------------------------------------------------------------------------
-// Área principal da biblioteca. Contém o Corujito, controla o diálogo dele,
-// libera a busca nas prateleiras após aceitar a missão e mostra as opções finais
-// depois que o livro é devolvido.
+// Área principal da biblioteca. Contém o Corujito
 // -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// ARQUIVO: biblioteca_principal.dart
-// OBJETIVO: controlar a área principal da biblioteca, onde fica o Corujito.
 // COMENTÁRIOS DETALHADOS DA ÁREA PRINCIPAL:
 // - O Corujito abre diálogos diferentes dependendo do progresso do jogador.
 // - Depois de aceitar a missão, aparece o marcador para procurar o livro.
