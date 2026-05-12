@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class MinigamePracaAlimentacao extends StatefulWidget {
   const MinigamePracaAlimentacao({super.key});
@@ -11,69 +12,110 @@ class MinigamePracaAlimentacao extends StatefulWidget {
 class _MinigamePracaAlimentacaoState
     extends State<MinigamePracaAlimentacao> {
 
-  int pedidoAtual = 0;
-  int pedidosConcluidos = 0;
+  final AudioPlayer musicPlayer = AudioPlayer();
 
-  bool geladeiraAberta = false;
+  int pedidoAtual = 0;
+
+  int pontos = 0;
 
   List<String> ingredientesSelecionados = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    tocarMusica();
+  }
+
+Future<void> tocarMusica() async {
+
+  await musicPlayer.setVolume(1.0);
+
+  await musicPlayer.setReleaseMode(
+    ReleaseMode.loop,
+  );
+
+  await musicPlayer.play(
+    AssetSource(
+      'audio/somminigamepraca.mp3',
+    ),
+  );
+}
+  @override
+  void dispose() {
+
+    musicPlayer.stop();
+    musicPlayer.dispose();
+
+    super.dispose();
+  }
 
   final List<Map<String, dynamic>> pedidos = [
 
     {
       'nome': 'X-Burguer',
+
       'ingredientes': [
         'Pão de baixo',
-        'Pão de cima',
         'Carne',
         'Queijo',
+        'Pão de cima',
+        'Refrigerante',
       ],
     },
 
     {
       'nome': 'X-Salada',
+
       'ingredientes': [
         'Pão de baixo',
-        'Pão de cima',
         'Carne',
         'Queijo',
         'Alface',
         'Tomate',
+        'Pão de cima',
+        'Refrigerante',
       ],
     },
 
     {
       'nome': 'X-Bacon',
+
       'ingredientes': [
-       'Pão de baixo',
-        'Pão de cima',
+        'Pão de baixo',
         'Carne',
         'Queijo',
         'Bacon',
+        'Pão de cima',
+        'Refrigerante',
       ],
     },
 
     {
       'nome': 'X-Tudo',
+
       'ingredientes': [
-       'Pão de baixo',
-        'Pão de cima',
+        'Pão de baixo',
         'Carne',
         'Queijo',
         'Bacon',
         'Alface',
         'Tomate',
+        'Pão de cima',
+        'Refrigerante',
       ],
     },
 
     {
       'nome': 'Combo Ratatoni',
+
       'ingredientes': [
-       'Pão de baixo',
-        'Pão de cima',
+        'Pão de baixo',
         'Carne',
         'Queijo',
         'Batata',
+        'Pão de cima',
+        'Refrigerante',
       ],
     },
   ];
@@ -83,30 +125,41 @@ class _MinigamePracaAlimentacaoState
 
   final Map<String, String> imagensIngredientes = {
 
-    'Pão de baixo': 'assets/fundo/Praça/paodebaixo.png',
+    'Pão de baixo':
+    'assets/fundo/Praca/paodebaixo.png',
 
-    'Pão de cima': 'assets/fundo/Praça/paodecima.png',
+    'Pão de cima':
+    'assets/fundo/Praca/paodecima.png',
 
-    'Carne': 'assets/fundo/Praça/carne.png',
+    'Carne':
+    'assets/fundo/Praca/carne.png',
 
-    'Queijo': 'assets/fundo/Praça/queijo.png',
+    'Queijo':
+    'assets/fundo/Praca/queijo.png',
 
-    'Bacon': 'assets/fundo/Praça/bacon.png',
+    'Bacon':
+    'assets/fundo/Praca/bacon.png',
 
-    'Alface': 'assets/fundo/Praça/alface.png',
+    'Alface':
+    'assets/fundo/Praca/alface.png',
 
-    'Tomate': 'assets/fundo/Praça/tomate.png',
+    'Tomate':
+    'assets/fundo/Praca/tomate.png',
 
-    'Batata': 'assets/fundo/Praça/batata.png',
+    'Batata':
+    'assets/fundo/Praca/batata.png',
+
+    'Refrigerante':
+    'assets/fundo/Praca/refri.png',
   };
 
-  void selecionarIngrediente(String item) {
+  void selecionarIngrediente(
+      String item,
+      ) {
 
     setState(() {
 
-      if (!ingredientesSelecionados.contains(item)) {
-        ingredientesSelecionados.add(item);
-      }
+      ingredientesSelecionados.add(item);
 
     });
   }
@@ -114,22 +167,19 @@ class _MinigamePracaAlimentacaoState
   void verificarPedido() {
 
     final ingredientesCorretos =
-    List.from(pedido['ingredientes']);
-
-    ingredientesCorretos.sort();
-
-    final selecionados =
-    List.from(ingredientesSelecionados);
-
-    selecionados.sort();
+    List<String>.from(
+      pedido['ingredientes'],
+    );
 
     bool lancheCorreto =
+
         ingredientesCorretos.join(',') ==
-            selecionados.join(',');
+
+            ingredientesSelecionados.join(',');
 
     if (lancheCorreto) {
 
-      pedidosConcluidos++;
+      pontos += 50;
 
       showDialog(
         context: context,
@@ -138,17 +188,22 @@ class _MinigamePracaAlimentacaoState
         builder: (_) {
 
           return Dialog(
+
             backgroundColor: Colors.transparent,
 
             child: Container(
-              padding: const EdgeInsets.all(20),
+
+              padding:
+              const EdgeInsets.all(20),
 
               decoration: BoxDecoration(
-                color: const Color.fromARGB(
-                    255,
-                    73,
-                    14,
-                    14
+
+                color:
+                const Color.fromARGB(
+                  255,
+                  73,
+                  14,
+                  14,
                 ),
 
                 borderRadius:
@@ -161,34 +216,62 @@ class _MinigamePracaAlimentacaoState
               ),
 
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+
+                mainAxisSize:
+                MainAxisSize.min,
 
                 children: [
 
                   const Text(
-                    'Pedido Completo!',
+                    'Pedido correto!',
+
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,
-                      fontFamily: 'PixelifySans',
+                      fontFamily:
+                      'PixelifySans',
                     ),
                   ),
 
-                  const SizedBox(height: 20),
-
-                  Image.asset(
-                    'assets/fundo/Praça/hamburguer.png',
-                    height: 220,
+                  const SizedBox(
+                    height: 20,
                   ),
 
-                  const SizedBox(height: 20),
+                  Image.asset(
+                    'assets/fundo/Praca/hamburguer.png',
+
+                    height: 220,
+                    fit: BoxFit.contain,
+                  ),
+
+                  const SizedBox(
+                    height: 20,
+                  ),
+
+                  Text(
+                    '+50 pontos',
+
+                    style: const TextStyle(
+                      color: Colors.yellow,
+                      fontSize: 24,
+                      fontFamily:
+                      'PixelifySans',
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 20,
+                  ),
 
                   ElevatedButton(
-                    onPressed: () {
+
+                    onPressed: () async {
 
                       Navigator.pop(context);
 
-                      if (pedidosConcluidos >= 5) {
+                      if (pontos >= 250) {
+
+                        await musicPlayer.stop();
 
                         showDialog(
                           context: context,
@@ -197,52 +280,59 @@ class _MinigamePracaAlimentacaoState
                           builder: (_) {
 
                             return AlertDialog(
+
                               backgroundColor:
                               const Color.fromARGB(
-                                  255,
-                                  73,
-                                  14,
-                                  14
+                                255,
+                                73,
+                                14,
+                                14,
                               ),
 
                               title: const Text(
                                 'Parabéns!',
+
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontFamily: 'PixelifySans',
+                                  fontFamily:
+                                  'PixelifySans',
                                 ),
                               ),
 
                               content: const Text(
                                 'Você completou todos os pedidos!',
+
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontFamily: 'PixelifySans',
+                                  fontFamily:
+                                  'PixelifySans',
                                 ),
                               ),
 
                               actions: [
 
                                 TextButton(
+
                                   onPressed: () {
 
-                                    Navigator.pop(context);
+                                    Navigator.pop(
+                                      context,
+                                    );
 
                                     Navigator.pop(
                                       context,
                                       true,
                                     );
-
                                   },
 
                                   child: const Text(
                                     'Continuar',
+
                                     style: TextStyle(
                                       color: Colors.white,
                                     ),
                                   ),
                                 ),
-
                               ],
                             );
                           },
@@ -252,26 +342,30 @@ class _MinigamePracaAlimentacaoState
 
                         setState(() {
 
-                          pedidoAtual++;
+                          if (pedidoAtual <
+                              pedidos.length - 1) {
 
-                          ingredientesSelecionados.clear();
+                            pedidoAtual++;
+                          }
 
-                          geladeiraAberta = false;
-
+                          ingredientesSelecionados
+                              .clear();
                         });
-
                       }
-
                     },
 
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                    style:
+                    ElevatedButton.styleFrom(
+                      backgroundColor:
+                      Colors.green,
                     ),
 
                     child: const Text(
                       'OK',
+
                       style: TextStyle(
-                        fontFamily: 'PixelifySans',
+                        fontFamily:
+                        'PixelifySans',
                       ),
                     ),
                   ),
@@ -290,45 +384,58 @@ class _MinigamePracaAlimentacaoState
         builder: (_) {
 
           return AlertDialog(
+
             backgroundColor:
             const Color.fromARGB(
-                255,
-                73,
-                14,
-                14
+              255,
+              73,
+              14,
+              14,
             ),
 
             title: const Text(
               'Pedido errado!',
+
               style: TextStyle(
                 color: Colors.white,
-                fontFamily: 'PixelifySans',
+                fontFamily:
+                'PixelifySans',
               ),
             ),
 
             content: const Text(
-              'Confira os ingredientes.',
+              'Monte novamente para pontuar!',
+
               style: TextStyle(
                 color: Colors.white,
-                fontFamily: 'PixelifySans',
+                fontFamily:
+                'PixelifySans',
               ),
             ),
 
             actions: [
 
               TextButton(
+
                 onPressed: () {
+
                   Navigator.pop(context);
+
+                  setState(() {
+
+                    ingredientesSelecionados
+                        .clear();
+                  });
                 },
 
                 child: const Text(
-                  'Ok',
+                  'Tentar novamente',
+
                   style: TextStyle(
                     color: Colors.white,
                   ),
                 ),
               ),
-
             ],
           );
         },
@@ -342,27 +449,36 @@ class _MinigamePracaAlimentacaoState
       ) {
 
     bool selecionado =
-    ingredientesSelecionados.contains(nome);
+    ingredientesSelecionados
+        .contains(nome);
 
     return GestureDetector(
 
       onTap: () {
+
         selecionarIngrediente(nome);
+
       },
 
       child: Container(
+
         width: 120,
-        margin: const EdgeInsets.all(8),
-        padding: const EdgeInsets.all(8),
+
+        margin:
+        const EdgeInsets.all(8),
+
+        padding:
+        const EdgeInsets.all(8),
 
         decoration: BoxDecoration(
+
           color: selecionado
               ? Colors.green
               : const Color.fromARGB(
-              255,
-              114,
-              28,
-              28
+            255,
+            114,
+            28,
+            28,
           ),
 
           borderRadius:
@@ -380,15 +496,22 @@ class _MinigamePracaAlimentacaoState
             Image.asset(
               imagem,
               height: 60,
+              fit: BoxFit.contain,
             ),
 
-            const SizedBox(height: 6),
+            const SizedBox(
+              height: 6,
+            ),
 
             Text(
               nome,
+
+              textAlign: TextAlign.center,
+
               style: const TextStyle(
                 color: Colors.white,
-                fontFamily: 'PixelifySans',
+                fontFamily:
+                'PixelifySans',
               ),
             ),
           ],
@@ -399,40 +522,102 @@ class _MinigamePracaAlimentacaoState
 
   Widget montarHamburguer() {
 
-    List<Widget> camadas = [];
+    List<String> ingredientesHamburguer =
 
-    for (String item in ingredientesSelecionados) {
+    ingredientesSelecionados.where(
 
-      if (item == 'Pão') {
+          (item) =>
 
-        camadas.add(
-          Image.asset(
-            'assets/fundo/Praça/paodebaixo.png',
-            width: 240,
+      item != 'Batata' &&
+          item != 'Refrigerante',
+
+    ).toList();
+
+    bool temBatata =
+    ingredientesSelecionados
+        .contains('Batata');
+
+    bool temRefri =
+    ingredientesSelecionados
+        .contains('Refrigerante');
+
+    return SizedBox(
+
+      width: 900,
+      height: 550,
+
+      child: Stack(
+
+        children: [
+
+          if (temRefri)
+
+            Positioned(
+              left: 20,
+              bottom: 30,
+
+              child: Image.asset(
+                imagensIngredientes[
+                'Refrigerante'
+                ]!,
+
+                width: 130,
+                height: 130,
+
+                fit: BoxFit.contain,
+              ),
+            ),
+
+          if (temBatata)
+
+            Positioned(
+              right: 60,
+              bottom: 30,
+
+              child: Image.asset(
+                imagensIngredientes['Batata']!,
+
+                width: 130,
+                height: 130,
+
+                fit: BoxFit.contain,
+              ),
+            ),
+
+          ...List.generate(
+
+            ingredientesHamburguer.length,
+
+                (index) {
+
+              String item =
+              ingredientesHamburguer[index];
+
+              bool ehPao =
+
+                  item == 'Pão de baixo' ||
+                      item == 'Pão de cima';
+
+              return Positioned(
+
+                left: ehPao ? 200 : 250,
+
+                bottom: index * 35,
+
+                child: Image.asset(
+
+                  imagensIngredientes[item]!,
+
+                  width: ehPao ? 320 : 220,
+                  height: ehPao ? 190 : 120,
+
+                  fit: BoxFit.contain,
+                ),
+              );
+            },
           ),
-        );
-
-        camadas.add(
-          Image.asset(
-            'assets/fundo/Praça/paodecima.png',
-            width: 240,
-          ),
-        );
-
-      } else {
-
-        camadas.add(
-          Image.asset(
-            imagensIngredientes[item]!,
-            width: 220,
-          ),
-        );
-      }
-    }
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: camadas,
+        ],
+      ),
     );
   }
 
@@ -446,13 +631,14 @@ class _MinigamePracaAlimentacaoState
 
           Positioned.fill(
             child: Image.asset(
-              'assets/fundo/Praça/pracaalimentacao.jpeg',
+              'assets/fundo/Praca/pracaalimentacao.jpg',
               fit: BoxFit.cover,
             ),
           ),
 
           Container(
-            color: Colors.black.withOpacity(0.45),
+            color: Colors.black
+                .withOpacity(0.45),
           ),
 
           Positioned(
@@ -460,7 +646,7 @@ class _MinigamePracaAlimentacaoState
             bottom: 20,
 
             child: Image.asset(
-              'assets/personagens/ratatoni.png',
+              'assets/fundo/personagens/ratatoni.png',
               height: 240,
             ),
           ),
@@ -470,15 +656,20 @@ class _MinigamePracaAlimentacaoState
             left: 30,
 
             child: Container(
-              width: 320,
-              padding: const EdgeInsets.all(18),
+
+              width: 360,
+
+              padding:
+              const EdgeInsets.all(18),
 
               decoration: BoxDecoration(
-                color: const Color.fromARGB(
-                    255,
-                    73,
-                    14,
-                    14
+
+                color:
+                const Color.fromARGB(
+                  255,
+                  73,
+                  14,
+                  14,
                 ).withOpacity(0.95),
 
                 borderRadius:
@@ -491,6 +682,7 @@ class _MinigamePracaAlimentacaoState
               ),
 
               child: Column(
+
                 crossAxisAlignment:
                 CrossAxisAlignment.start,
 
@@ -498,32 +690,58 @@ class _MinigamePracaAlimentacaoState
 
                   Text(
                     'Pedido ${pedidoAtual + 1}/5',
+
                     style: const TextStyle(
                       color: Colors.yellow,
                       fontSize: 22,
-                      fontFamily: 'PixelifySans',
+                      fontFamily:
+                      'PixelifySans',
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(
+                    height: 10,
+                  ),
 
                   Text(
                     pedido['nome'],
+
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 26,
-                      fontFamily: 'PixelifySans',
+                      fontFamily:
+                      'PixelifySans',
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(
+                    height: 10,
+                  ),
 
                   Text(
-                    pedido['ingredientes'].join(', '),
+                    pedido['ingredientes']
+                        .join(', '),
+
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 16,
-                      fontFamily: 'PixelifySans',
+                      fontFamily:
+                      'PixelifySans',
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 12,
+                  ),
+
+                  Text(
+                    'Pontos: $pontos / 250',
+
+                    style: const TextStyle(
+                      color: Colors.yellow,
+                      fontSize: 20,
+                      fontFamily:
+                      'PixelifySans',
                     ),
                   ),
                 ],
@@ -531,26 +749,29 @@ class _MinigamePracaAlimentacaoState
             ),
           ),
 
-          // HAMBÚRGUER SENDO MONTADO
           Center(
             child: SizedBox(
-              width: 300,
-              height: 450,
+              width: 900,
+              height: 550,
+
               child: montarHamburguer(),
             ),
           ),
 
-          // BANCADA
           Positioned(
             left: 20,
             right: 20,
             bottom: 20,
 
             child: Container(
-              padding: const EdgeInsets.all(16),
+
+              padding:
+              const EdgeInsets.all(16),
 
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.82),
+
+                color: Colors.black
+                    .withOpacity(0.82),
 
                 borderRadius:
                 BorderRadius.circular(18),
@@ -561,68 +782,85 @@ class _MinigamePracaAlimentacaoState
 
                   const Text(
                     'Ingredientes',
+
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
-                      fontFamily: 'PixelifySans',
+                      fontFamily:
+                      'PixelifySans',
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(
+                    height: 12,
+                  ),
 
                   Wrap(
-                    alignment: WrapAlignment.center,
+
+                    alignment:
+                    WrapAlignment.center,
+
                     children: [
 
                       ingredienteBotao(
                         'Pão de baixo',
-                        'assets/fundo/Praça/paodebaixo.png',
+                        'assets/fundo/Praca/paodebaixo.png',
                       ),
 
                       ingredienteBotao(
-                          'Pão de cima',
-                          'assets/fundo/Praça/paodecima.png',
-                        ),
+                        'Pão de cima',
+                        'assets/fundo/Praca/paodecima.png',
+                      ),
 
                       ingredienteBotao(
                         'Carne',
-                        'assets/fundo/Praça/carne.png',
+                        'assets/fundo/Praca/carne.png',
                       ),
 
                       ingredienteBotao(
                         'Queijo',
-                        'assets/fundo/Praça/queijo.png',
+                        'assets/fundo/Praca/queijo.png',
                       ),
 
                       ingredienteBotao(
                         'Bacon',
-                        'assets/fundo/Praça/bacon.png',
+                        'assets/fundo/Praca/bacon.png',
                       ),
 
                       ingredienteBotao(
                         'Alface',
-                        'assets/fundo/Praça/alface.png',
+                        'assets/fundo/Praca/alface.png',
                       ),
 
                       ingredienteBotao(
                         'Tomate',
-                        'assets/fundo/Praça/tomate.png',
+                        'assets/fundo/Praca/tomate.png',
                       ),
 
                       ingredienteBotao(
                         'Batata',
-                        'assets/fundo/Praça/batata.png',
+                        'assets/fundo/Praca/batata.png',
+                      ),
+
+                      ingredienteBotao(
+                        'Refrigerante',
+                        'assets/fundo/Praca/refri.png',
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(
+                    height: 20,
+                  ),
 
                   ElevatedButton(
-                    onPressed: verificarPedido,
+
+                    onPressed:
+                    verificarPedido,
 
                     style:
                     ElevatedButton.styleFrom(
+
                       backgroundColor:
                       Colors.green,
 
@@ -635,9 +873,11 @@ class _MinigamePracaAlimentacaoState
 
                     child: const Text(
                       'ENTREGAR PEDIDO',
+
                       style: TextStyle(
                         fontSize: 18,
-                        fontFamily: 'PixelifySans',
+                        fontFamily:
+                        'PixelifySans',
                       ),
                     ),
                   ),
@@ -651,12 +891,18 @@ class _MinigamePracaAlimentacaoState
             right: 20,
 
             child: GestureDetector(
-              onTap: () {
+
+              onTap: () async {
+
+                await musicPlayer.stop();
+
                 Navigator.pop(context);
               },
 
               child: Container(
-                padding: const EdgeInsets.all(10),
+
+                padding:
+                const EdgeInsets.all(10),
 
                 decoration: BoxDecoration(
                   color: Colors.black54,
