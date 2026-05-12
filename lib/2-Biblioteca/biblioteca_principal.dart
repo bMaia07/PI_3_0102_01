@@ -187,10 +187,71 @@ class _DialogoCorujitoState extends State<_DialogoCorujito> {
   bool _fecharAoFinal = false;
   bool _marcarLivroEntregueAoFinal = false;
 
+  String _textoExibido = '';
+  String _textoCompleto = '';
+  int _indiceChar = 0;
+  bool _digitando = false;
+  int _tokenDigitacao = 0;
+
   @override
   void initState() {
     super.initState();
     _configurarDialogoInicial();
+    _prepararTextoInicial();
+  }
+
+  void _prepararTextoInicial() {
+    if (_falas.isEmpty) return;
+
+    _textoCompleto = _falas[_indiceFala].texto;
+    _textoExibido = '';
+    _indiceChar = 0;
+    _digitando = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _proximoCaractere(_tokenDigitacao);
+    });
+  }
+
+  void _iniciarDigitacao(String texto) {
+    _tokenDigitacao++;
+
+    setState(() {
+      _textoCompleto = texto;
+      _textoExibido = '';
+      _indiceChar = 0;
+      _digitando = true;
+    });
+
+    _proximoCaractere(_tokenDigitacao);
+  }
+
+  void _proximoCaractere(int token) {
+    if (!mounted || token != _tokenDigitacao) return;
+
+    if (_indiceChar < _textoCompleto.length) {
+      setState(() {
+        _textoExibido += _textoCompleto[_indiceChar];
+        _indiceChar++;
+      });
+
+      Future.delayed(const Duration(milliseconds: 28), () {
+        if (mounted) _proximoCaractere(token);
+      });
+    } else {
+      setState(() {
+        _digitando = false;
+      });
+    }
+  }
+
+  void _concluirDigitacao() {
+    _tokenDigitacao++;
+    setState(() {
+      _textoExibido = _textoCompleto;
+      _indiceChar = _textoCompleto.length;
+      _digitando = false;
+    });
   }
 
   // Monta a lista de falas correta para o momento atual da missão.
@@ -311,12 +372,18 @@ class _DialogoCorujitoState extends State<_DialogoCorujito> {
   // Avança as falas e, no fim, abre opções ou fecha o diálogo conforme o estado.
   // Avança para a próxima fala ou mostra opções quando chega ao fim.
   void _proximaFala() {
+    if (_digitando) {
+      _concluirDigitacao();
+      return;
+    }
+
     if (_mostrarOpcoes || _mostrarOpcoesFinais) return;
 
     if (_indiceFala < _falas.length - 1) {
       setState(() {
         _indiceFala++;
       });
+      _iniciarDigitacao(_falas[_indiceFala].texto);
       return;
     }
 
@@ -352,6 +419,8 @@ class _DialogoCorujitoState extends State<_DialogoCorujito> {
       _mostrarOpcoes = false;
       _fecharAoFinal = true;
     });
+
+    _iniciarDigitacao(_falas[_indiceFala].texto);
   }
 
   // Jogador recusa a missão; o diálogo fecha.
@@ -388,163 +457,226 @@ class _DialogoCorujitoState extends State<_DialogoCorujito> {
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 760,
-          maxHeight: 560,
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0A0E27).withOpacity(0.97),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.cyanAccent, width: 2.5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.50),
-                blurRadius: 20,
-                offset: const Offset(6, 6),
-              ),
-              BoxShadow(
-                color: Colors.cyanAccent.withOpacity(0.13),
-                blurRadius: 22,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+      insetPadding: EdgeInsets.zero,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final double larguraTela = constraints.maxWidth;
+          final bool telaPequena = larguraTela < 850;
+          final double larguraRetrato = telaPequena ? 150 : 220;
+          final double alturaRetrato = telaPequena ? 150 : 210;
+          final double esquerdaCaixa = telaPequena ? 20 : 265;
+          final double base = telaPequena ? 24 : 60;
+
+          return Stack(
             children: [
-              Row(
-                children: [
-                  if (falandoCorujito)
-                    Image.asset(
-                      'assets/personagens/corujito.png',
-                      width: 78,
-                      height: 78,
-                      filterQuality: FilterQuality.none,
-                      isAntiAlias: false,
-                    )
-                  else
+              Positioned(
+                left: 16,
+                bottom: base - 20,
+                child: Column(
+                  children: [
                     Container(
-                      width: 64,
-                      height: 64,
+                      width: larguraRetrato,
+                      height: alturaRetrato,
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.blue[900],
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                      child: const Icon(
-                        Icons.person,
                         color: Colors.white,
-                        size: 34,
+                        border: Border.all(color: Colors.cyanAccent, width: 4),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.cyanAccent.withOpacity(0.30),
+                            blurRadius: 18,
+                          ),
+                        ],
                       ),
+                      child: falandoCorujito
+                          ? Image.asset(
+                              'assets/personagens/corujito.png',
+                              fit: BoxFit.contain,
+                              filterQuality: FilterQuality.none,
+                              isAntiAlias: false,
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1A1F3A),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.person,
+                                color: Colors.white,
+                                size: 72,
+                              ),
+                            ),
                     ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                       decoration: BoxDecoration(
-                        color: falandoCorujito
-                            ? Colors.cyanAccent.withOpacity(0.16)
-                            : Colors.blueAccent.withOpacity(0.16),
+                        color: const Color(0xFF0A0E27),
+                        border: Border.all(color: Colors.cyanAccent, width: 2),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: falandoCorujito ? Colors.cyanAccent : Colors.blueAccent,
-                          width: 1.5,
-                        ),
                       ),
                       child: Text(
                         nomeExibido,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontFamily: 'PixelifySans',
                           fontSize: 16,
-                          color: falandoCorujito ? Colors.cyanAccent : Colors.white,
+                          color: Colors.cyanAccent,
                           letterSpacing: 2,
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      falaAtual.texto,
-                      style: const TextStyle(
-                        fontFamily: 'PixelifySans',
-                        fontSize: 14,
-                        color: Colors.white,
-                        height: 1.55,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              if (_mostrarOpcoes)
-                Column(
-                  children: [
-                    _BotaoDialogoCorujito(
-                      texto: 'Por mim pode ser!',
-                      onTap: _aceitarProposta,
-                    ),
-                    const SizedBox(height: 10),
-                    _BotaoDialogoCorujito(
-                      texto: 'Não estou interessado nessa proposta.',
-                      onTap: _recusarProposta,
-                      corBorda: Colors.redAccent,
-                      corTexto: Colors.redAccent,
-                    ),
-                  ],
-                )
-              else if (_mostrarOpcoesFinais)
-                Column(
-                  children: [
-                    _BotaoDialogoCorujito(
-                      texto: 'IR PARA A PRAÇA DE ALIMENTAÇÃO',
-                      onTap: _irParaPracaAlimentacao,
-                    ),
-                    const SizedBox(height: 10),
-                    _BotaoDialogoCorujito(
-                      texto: 'VOLTAR PARA O MENU PRINCIPAL',
-                      onTap: _voltarMenuPrincipal,
-                      corBorda: Colors.white70,
-                      corTexto: Colors.white,
-                    ),
-                  ],
-                )
-              else
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (!_fecharAoFinal || _indiceFala < _falas.length - 1)
-                      Text(
-                        '[ TOQUE PARA CONTINUAR ]',
-                        style: TextStyle(
-                          fontFamily: 'PixelifySans',
-                          fontSize: 10,
-                          color: Colors.white.withOpacity(0.55),
-                          letterSpacing: 1.5,
+              Positioned(
+                left: esquerdaCaixa,
+                right: 32,
+                bottom: base,
+                child: GestureDetector(
+                  onTap: _proximaFala,
+                  child: Container(
+                    constraints: const BoxConstraints(minHeight: 180),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0A0E27).withOpacity(0.96),
+                      border: Border.all(color: Colors.cyanAccent, width: 3),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(8),
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black87,
+                          blurRadius: 15,
+                          offset: Offset(6, 6),
                         ),
-                      ),
-                    const SizedBox(width: 12),
-                    _BotaoDialogoCorujito(
-                      texto: _indiceFala == _falas.length - 1 && _fecharAoFinal
-                          ? 'FECHAR'
-                          : 'CONTINUAR',
-                      onTap: _proximaFala,
-                      larguraFixa: false,
+                      ],
                     ),
-                  ],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.cyanAccent,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.chat_bubble, color: Colors.black, size: 16),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    nomeExibido,
+                                    style: const TextStyle(
+                                      fontFamily: 'PixelifySans',
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      letterSpacing: 1.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Spacer(),
+                            if (_digitando)
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.cyanAccent.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Row(
+                                  children: const [
+                                    SizedBox(
+                                      width: 12,
+                                      height: 12,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.cyanAccent,
+                                      ),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'DIGITANDO...',
+                                      style: TextStyle(
+                                        fontFamily: 'PixelifySans',
+                                        fontSize: 9,
+                                        color: Colors.cyanAccent,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Flexible(
+                          child: SingleChildScrollView(
+                            child: Text(
+                              _textoExibido,
+                              style: const TextStyle(
+                                fontFamily: 'PixelifySans',
+                                fontSize: 16,
+                                color: Colors.white,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (!_digitando && !_mostrarOpcoes && !_mostrarOpcoesFinais)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: Text(
+                              '▯ Toque para continuar...',
+                              style: TextStyle(
+                                fontFamily: 'PixelifySans',
+                                fontSize: 11,
+                                color: Colors.cyanAccent.withOpacity(0.65),
+                              ),
+                            ),
+                          ),
+                        if (_mostrarOpcoes) ...[
+                          const SizedBox(height: 16),
+                          _BotaoDialogoCorujito(
+                            texto: 'Por mim pode ser!',
+                            onTap: _aceitarProposta,
+                          ),
+                          const SizedBox(height: 10),
+                          _BotaoDialogoCorujito(
+                            texto: 'Não estou interessado nessa proposta.',
+                            onTap: _recusarProposta,
+                            corBorda: Colors.redAccent,
+                            corTexto: Colors.redAccent,
+                          ),
+                        ] else if (_mostrarOpcoesFinais) ...[
+                          const SizedBox(height: 16),
+                          _BotaoDialogoCorujito(
+                            texto: 'IR PARA A PRAÇA DE ALIMENTAÇÃO',
+                            onTap: _irParaPracaAlimentacao,
+                          ),
+                          const SizedBox(height: 10),
+                          _BotaoDialogoCorujito(
+                            texto: 'VOLTAR PARA O MENU PRINCIPAL',
+                            onTap: _voltarMenuPrincipal,
+                            corBorda: Colors.white70,
+                            corTexto: Colors.white,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
+              ),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }
