@@ -1,68 +1,107 @@
 // -----------------------------------------------------------------------------
 // ARQUIVO: game_progress.dart
-// OBJETIVO: guardar o progresso global do jogo enquanto o aplicativo está aberto.
-// IMPORTANTE: esse controle é simples e fica em memória; se o app for recarregado,
-// os valores voltam ao padrão, a menos que outra parte do projeto salve esses dados.
+// OBJETIVO: guardar o progresso global do jogo.
+// Usa shared_preferences para persistir entre sessões (Flutter Web = localStorage).
 // -----------------------------------------------------------------------------
 
-// Classe com variáveis e métodos estáticos.
-// Como tudo é static, qualquer tela consegue acessar o progresso sem criar objeto.
+import 'package:shared_preferences/shared_preferences.dart';
+
 class GameProgress {
-  // Indica se o botão/entrada da biblioteca já está liberado no jogo.
-  // Começa false porque o jogador primeiro precisa passar pelo H15/Pingo.
+  // ======================== BIBLIOTECA ========================
+
   static bool bibliotecaDesbloqueada = false;
-
-  // Indica se o jogador aceitou a missão do Corujito para procurar o livro.
-  // Quando true, aparece o marcador PROCURAR na área principal da biblioteca.
   static bool missaoCorujitoAceita = false;
-
-  // Indica se o jogador concluiu o puzzle do acervo e encontrou o livro.
-  // Quando true, ao clicar no Corujito começa o diálogo de devolução.
   static bool livroCorujitoEncontrado = false;
-
-  // Indica se o jogador já devolveu o livro para o Corujito.
-  // Quando true, a missão da biblioteca fica finalizada.
   static bool livroCorujitoEntregue = false;
 
-  // Libera a biblioteca depois que o jogador passa pela etapa do H15/Pingo.
-  static void desbloquearBiblioteca() {
-    // Troca a biblioteca para liberada.
+  // ======================== ARQUITETURA ========================
+
+  // Indica se o jogador já acessou o prédio de arquitetura (passou pelo OUT).
+  static bool arquiteturaDesbloqueada = false;
+
+  // Indica se o jogador concluiu toda a fase (puzzle + diálogo pós).
+  static bool arquiteturaConcluida = false;
+
+  // ======================== SALVAR ========================
+
+  /// Salva todo o progresso atual no localStorage (shared_preferences).
+  static Future<void> salvar() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool('bibliotecaDesbloqueada', bibliotecaDesbloqueada);
+    await prefs.setBool('missaoCorujitoAceita', missaoCorujitoAceita);
+    await prefs.setBool('livroCorujitoEncontrado', livroCorujitoEncontrado);
+    await prefs.setBool('livroCorujitoEntregue', livroCorujitoEntregue);
+    await prefs.setBool('arquiteturaDesbloqueada', arquiteturaDesbloqueada);
+    await prefs.setBool('arquiteturaConcluida', arquiteturaConcluida);
+  }
+
+  // ======================== CARREGAR ========================
+
+  /// Carrega o progresso salvo do localStorage para as variáveis em memória.
+  /// Chamar isso no initState da tela inicial ou do mapa de exploração.
+  static Future<void> carregar() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    bibliotecaDesbloqueada =
+        prefs.getBool('bibliotecaDesbloqueada') ?? false;
+    missaoCorujitoAceita =
+        prefs.getBool('missaoCorujitoAceita') ?? false;
+    livroCorujitoEncontrado =
+        prefs.getBool('livroCorujitoEncontrado') ?? false;
+    livroCorujitoEntregue =
+        prefs.getBool('livroCorujitoEntregue') ?? false;
+    arquiteturaDesbloqueada =
+        prefs.getBool('arquiteturaDesbloqueada') ?? false;
+    arquiteturaConcluida =
+        prefs.getBool('arquiteturaConcluida') ?? false;
+  }
+
+  // ======================== BIBLIOTECA — MÉTODOS ========================
+
+  static Future<void> desbloquearBiblioteca() async {
     bibliotecaDesbloqueada = true;
+    await salvar();
   }
 
-  // Marca que o jogador aceitou a proposta do Corujito.
-  static void aceitarMissaoCorujito() {
-    // A partir daqui o jogador pode procurar o livro no acervo.
+  static Future<void> aceitarMissaoCorujito() async {
     missaoCorujitoAceita = true;
+    await salvar();
   }
 
-  // Marca que o jogador achou o livro no puzzle do acervo.
-  static void marcarLivroCorujitoEncontrado() {
-    // Essa variável faz o próximo clique no Corujito abrir o diálogo de devolução.
+  static Future<void> marcarLivroCorujitoEncontrado() async {
     livroCorujitoEncontrado = true;
+    await salvar();
   }
 
-  // Finaliza a missão do livro após a devolução para o Corujito.
-  static void entregarLivroCorujito() {
-    // Guarda que o livro já foi entregue.
+  static Future<void> entregarLivroCorujito() async {
     livroCorujitoEntregue = true;
-
-    // Como o livro já foi entregue, ele não precisa mais ficar como "encontrado".
     livroCorujitoEncontrado = false;
+    await salvar();
   }
 
-  // Reseta o progresso da biblioteca ao iniciar um novo jogo/save.
-  static void resetar() {
-    // Bloqueia novamente a biblioteca.
+  // ======================== ARQUITETURA — MÉTODOS ========================
+
+  static Future<void> desbloquearArquitetura() async {
+    arquiteturaDesbloqueada = true;
+    await salvar();
+  }
+
+  /// Chamado ao final de arquiteturaPOS, quando o jogador clica "VOLTAR AO MAPA".
+  static Future<void> concluirArquitetura() async {
+    arquiteturaConcluida = true;
+    await salvar();
+  }
+
+  // ======================== RESET ========================
+
+  static Future<void> resetar() async {
     bibliotecaDesbloqueada = false;
-
-    // Remove a missão aceita do Corujito.
     missaoCorujitoAceita = false;
-
-    // Remove o estado de livro encontrado.
     livroCorujitoEncontrado = false;
-
-    // Remove o estado de livro entregue.
     livroCorujitoEntregue = false;
+    arquiteturaDesbloqueada = false;
+    arquiteturaConcluida = false;
+    await salvar();
   }
 }

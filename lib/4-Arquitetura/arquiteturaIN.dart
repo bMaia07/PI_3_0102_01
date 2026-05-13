@@ -81,7 +81,7 @@ class _TelaArquiteturaINState
           "Claro! O que está acontecendo?",
       personagem: "Jogador",
       imagem:
-          "assets/personagens/player-masc1.png",
+          "",
     ),
 
     Dialogo(
@@ -256,11 +256,11 @@ class _TelaArquiteturaINState
                 padding: EdgeInsets.only(
                   bottom: 180,
 
-                  left:
-                      atual.personagem ==
-                              "Jogador"
-                          ? 20
-                          : 0,
+                  //left:
+                      //atual.personagem ==
+                              //"Jogador"
+                          //? 20
+                          //: 0,
 
                   right:
                       atual.personagem ==
@@ -419,7 +419,8 @@ class _TelaArquiteturaINState
                         ),
                       ),
 
-                    // BOTÃO
+                    // BOTÃO COMEÇAR DESAFIO — sem salvamento aqui,
+                    // o progresso só é salvo ao CONCLUIR toda a fase no POS.
                     if (acabouDialogo)
                       Center(
                         child: GestureDetector(
@@ -432,7 +433,7 @@ class _TelaArquiteturaINState
                               MaterialPageRoute(
                                 builder:
                                     (context) =>
-                                        MiniGameKoda (),
+                                        MiniGameKoda(),
                               ),
                             );
                           },

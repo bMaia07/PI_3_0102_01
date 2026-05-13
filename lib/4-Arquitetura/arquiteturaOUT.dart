@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 
 import 'arquiteturaIN.dart';
 import '../tela_mapa_exploracao.dart';
+import '../game_progress.dart';
 
 class TelaArquiteturaOUT extends StatefulWidget {
   @override
@@ -343,11 +344,14 @@ class _TelaArquiteturaOUTState
                         ),
                       ),
 
-                    // BOTÃO
+                    // BOTÃO ENTRAR — salva que a arquitetura foi desbloqueada
                     if (acabouDialogo)
                       Center(
                         child: GestureDetector(
                           onTap: () async {
+
+                            // Marca que o jogador entrou no prédio de arquitetura
+                            await GameProgress.desbloquearArquitetura();
 
                             await _player.stop();
 
