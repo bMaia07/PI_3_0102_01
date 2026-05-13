@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 import '../tela_mapa_exploracao.dart';
+import '../game_progress.dart';
 
 class TelaArquiteturaPOS extends StatefulWidget {
   @override
@@ -84,7 +85,7 @@ class _TelaArquiteturaPOSState
           "Era só questão de lógica.",
       personagem: "Jogador",
       imagem:
-          "assets/personagens/player-masc1.png",
+          "",
     ),
 
     Dialogo(
@@ -100,7 +101,7 @@ class _TelaArquiteturaPOSState
           "O que foi?",
       personagem: "Jogador",
       imagem:
-          "assets/personagens/player-masc1.png",
+          "",
     ),
 
     Dialogo(
@@ -116,7 +117,7 @@ class _TelaArquiteturaPOSState
           "Onde posso ir em busca dela?",
       personagem: "Jogador",
       imagem:
-          "assets/personagens/player-masc1.png",
+          "",
     ),
 
     Dialogo(
@@ -132,7 +133,7 @@ class _TelaArquiteturaPOSState
           "Entendi. Vou dar uma olhada.",
       personagem: "Jogador",
       imagem:
-          "assets/personagens/player-masc1.png",
+          "",
     ),
 
     Dialogo(
@@ -163,7 +164,7 @@ class _TelaArquiteturaPOSState
           "Interessante...",
       personagem: "Jogador",
       imagem:
-          "assets/personagens/player-masc1.png",
+          "",
     ),
 
     Dialogo(
@@ -317,7 +318,7 @@ class _TelaArquiteturaPOSState
             ),
           ),
 
-          // ================= BOTÃO SOM =================
+          // ================= BOTÃO DE SOM =================
 
           Positioned(
             top: 40,
@@ -358,17 +359,17 @@ class _TelaArquiteturaPOSState
               )
 
             // ================= JOGADOR =================
-            else if (atual.personagem == "Jogador")
-              Positioned(
-                bottom: 220,
-                right: 30,
+            //else if (atual.personagem == "Jogador")
+            //  Positioned(
+            //    bottom: 220,
+            /*    right: 30,
 
                 child: Image.asset(
                   atual.imagem,
                   height: 300,
                 ),
               )
-
+            */
             // ================= ESQUADRO =================
             else
               Positioned(
@@ -540,11 +541,16 @@ class _TelaArquiteturaPOSState
                       ),
 
                     // ================= BOTÃO FINAL =================
+                    // Aqui é o ponto de conclusão da fase inteira.
+                    // Salva arquiteturaConcluida = true antes de voltar ao mapa.
 
                     if (acabouDialogo)
                       Center(
                         child: GestureDetector(
                           onTap: () async {
+
+                            // Salva que a fase de arquitetura foi concluída
+                            await GameProgress.concluirArquitetura();
 
                             await _player.stop();
 
