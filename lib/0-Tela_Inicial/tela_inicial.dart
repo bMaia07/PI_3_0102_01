@@ -237,7 +237,7 @@ class _TelaInicialState extends State<TelaInicial> {
                   height: 140,
                   child: GridView.count(
                     crossAxisCount: 3,
-                    childAspectRatio: 0.8, // 👈 melhora proporção
+                    childAspectRatio: 0.8,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
                     children: [
@@ -589,9 +589,15 @@ class _TelaInicialState extends State<TelaInicial> {
     _mostrarSavesFirebase(context);
   }
 
-  // Mini tela exibida quando o jogador tenta abrir a biblioteca antes de passar pelo H15.
-  // Mostra uma janela bonita quando a biblioteca ainda está bloqueada.
-  void _mostrarBibliotecaBloqueadaDialogo() {
+  // ======================== DIÁLOGOS DE BLOQUEIO ========================
+
+  /// Exibe um diálogo genérico de fase bloqueada.
+  /// [nomeFase] = nome exibido no título (ex: "BIBLIOTECA").
+  /// [requisito] = o que o jogador precisa fazer antes (ex: "Conclua o H15 primeiro.").
+  void _mostrarFaseBloqueada({
+    required String nomeFase,
+    required String requisito,
+  }) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -636,10 +642,10 @@ class _TelaInicialState extends State<TelaInicial> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                const Text(
-                  'ACESSO BLOQUEADO',
+                Text(
+                  '$nomeFase BLOQUEADA',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'PixelifySans',
                     fontSize: 20,
                     color: Colors.cyanAccent,
@@ -647,10 +653,10 @@ class _TelaInicialState extends State<TelaInicial> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                const Text(
-                  'biblioteca bloqueada!!!\n\npasse primeiro pelo prédio H15',
+                Text(
+                  requisito,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'PixelifySans',
                     fontSize: 14,
                     color: Colors.white,
@@ -684,6 +690,229 @@ class _TelaInicialState extends State<TelaInicial> {
           ),
         );
       },
+    );
+  }
+
+  // ======================== MENU DE ESCOLHA DE LOCAL ========================
+
+  /// Constrói um botão de fase no menu "ESCOLHA O LOCAL" com suporte a cadeado.
+  /// [desbloqueada] = se false, exibe o cadeado e bloqueia a navegação.
+  Widget _buildBotaoFase({
+    required String texto,
+    required bool desbloqueada,
+    required VoidCallback onTapDesbloqueado,
+    required String nomeFase,
+    required String requisito,
+  }) {
+    return GestureDetector(
+      onTap: desbloqueada
+          ? onTapDesbloqueado
+          : () => _mostrarFaseBloqueada(
+                nomeFase: nomeFase,
+                requisito: requisito,
+              ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        decoration: BoxDecoration(
+          // Fundo mais escuro/acinzentado quando bloqueado.
+          color: desbloqueada ? Colors.blue[900] : const Color(0xFF1A1A2E),
+          border: Border.all(
+            color: desbloqueada ? Colors.white : Colors.white30,
+            width: 3,
+          ),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: desbloqueada
+              ? [BoxShadow(color: Colors.black, offset: Offset(5, 5))]
+              : [],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (!desbloqueada)
+              const Padding(
+                padding: EdgeInsets.only(right: 8),
+                child: Icon(Icons.lock, color: Colors.white30, size: 16),
+              ),
+            Text(
+              texto,
+              style: TextStyle(
+                fontFamily: 'PixelifySans',
+                fontSize: 14,
+                color: desbloqueada ? Colors.white : Colors.white30,
+                letterSpacing: 2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _mostrarEscolhaLocal(BuildContext context) async {
+    // Carrega o progresso mais recente antes de exibir o menu.
+    await GameProgress.carregar();
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // ── Regras de desbloqueio progressivo ──────────────────────────────
+        // H15          → sempre disponível (fase inicial)
+        // Biblioteca   → requer h15Concluida
+        // Praça        → requer livroCorujitoEntregue (missão da biblioteca concluída)
+        // Arquitetura  → requer pracaDesbloqueada (= livroCorujitoEntregue)
+        // Manacás      → requer arquiteturaConcluida
+        final bool h15Ok = true; // sempre desbloqueado
+        final bool bibliotecaOk = GameProgress.h15Concluida;
+        final bool pracaOk = GameProgress.pracaDesbloqueada;
+        final bool arquiteturaOk = GameProgress.pracaDesbloqueada; // entra pela praça
+        final bool manacasOk = GameProgress.manacasDesbloqueada;
+
+        return Dialog(
+          backgroundColor: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(color: Colors.white, width: 3),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "ESCOLHA O LOCAL",
+                  style: TextStyle(
+                    fontFamily: 'PixelifySans',
+                    fontSize: 18,
+                    color: Colors.cyanAccent,
+                    letterSpacing: 2,
+                  ),
+                ),
+                SizedBox(height: 20),
+
+                // TESTAR NOVO JOGO (sem restrição — opção de dev)
+                _buildBotaoPixel("TESTAR NOVO JOGO", () {
+                  Navigator.pop(context);
+                  Future.microtask(() {
+                    _iniciarNovoJogo(this.context);
+                  });
+                }, true),
+                SizedBox(height: 10),
+
+                // H15 — sempre desbloqueado
+                _buildBotaoFase(
+                  texto: 'H15 TECNOLOGIA',
+                  desbloqueada: h15Ok,
+                  onTapDesbloqueado: () {
+                    Navigator.pop(context);
+                    _navegarPara(this.context, '/h15');
+                  },
+                  nomeFase: 'H15',
+                  requisito: '',
+                ),
+                SizedBox(height: 10),
+
+                // BIBLIOTECA — requer H15 concluído
+                _buildBotaoFase(
+                  texto: 'BIBLIOTECA',
+                  desbloqueada: bibliotecaOk,
+                  onTapDesbloqueado: () {
+                    Navigator.pop(context);
+                    _navegarPara(this.context, '/biblioteca');
+                  },
+                  nomeFase: 'BIBLIOTECA',
+                  requisito:
+                      'Você precisa concluir o\nprédio H15 primeiro!',
+                ),
+                SizedBox(height: 10),
+
+                // PRAÇA DE ALIMENTAÇÃO — requer missão da biblioteca concluída
+                _buildBotaoFase(
+                  texto: 'PRAÇA',
+                  desbloqueada: pracaOk,
+                  onTapDesbloqueado: () {
+                    Navigator.pop(context);
+                    _navegarPara(this.context, '/refeitorio');
+                  },
+                  nomeFase: 'PRAÇA',
+                  requisito:
+                      'Você precisa concluir a\nmissão da Biblioteca primeiro!',
+                ),
+                SizedBox(height: 10),
+
+                // H12 ARQUITETURA — requer praça concluída
+                _buildBotaoFase(
+                  texto: 'H12 ARQUITETURA',
+                  desbloqueada: arquiteturaOk,
+                  onTapDesbloqueado: () {
+                    Navigator.pop(context);
+                    _navegarPara(this.context, '/h12');
+                  },
+                  nomeFase: 'ARQUITETURA',
+                  requisito:
+                      'Você precisa passar pela\nPraça de Alimentação primeiro!',
+                ),
+                SizedBox(height: 10),
+
+                // MANACÁS — requer arquitetura concluída
+                _buildBotaoFase(
+                  texto: 'MANACÁS (CAVE)',
+                  desbloqueada: manacasOk,
+                  onTapDesbloqueado: () {
+                    Navigator.pop(context);
+                    _navegarPara(this.context, '/manacas');
+                  },
+                  nomeFase: 'MANACÁS',
+                  requisito:
+                      'Você precisa concluir o\nprédio de Arquitetura primeiro!',
+                ),
+                SizedBox(height: 15),
+
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Text(
+                    "CANCELAR",
+                    style: TextStyle(
+                      fontFamily: 'PixelifySans',
+                      color: Colors.white54,
+                      fontSize: 12,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBotaoPixel(String texto, VoidCallback onTap, bool pequeno) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          vertical: pequeno ? 10 : 18,
+          horizontal: pequeno ? 25 : 55,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.blue[900],
+          border: Border.all(color: Colors.white, width: 3),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [BoxShadow(color: Colors.black, offset: Offset(5, 5))],
+        ),
+        child: Text(
+          texto,
+          style: TextStyle(
+            fontSize: pequeno ? 14 : 18,
+            color: Colors.white,
+            fontFamily: 'PixelifySans',
+            letterSpacing: 2,
+          ),
+        ),
+      ),
     );
   }
 
@@ -757,7 +986,7 @@ class _TelaInicialState extends State<TelaInicial> {
             ),
           ),
 
-          // NOVO: Botão mute/unmute no canto superior direito
+          // Botão mute/unmute no canto superior direito
           Positioned(
             top: 40,
             right: 20,
@@ -782,110 +1011,6 @@ class _TelaInicialState extends State<TelaInicial> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _mostrarEscolhaLocal(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-            side: BorderSide(color: Colors.white, width: 3),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "ESCOLHA O LOCAL",
-                  style: TextStyle(
-                    fontFamily: 'PixelifySans',
-                    fontSize: 18,
-                    color: Colors.cyanAccent,
-                    letterSpacing: 2,
-                  ),
-                ),
-                SizedBox(height: 20),
-                _buildBotaoPixel("TESTAR NOVO JOGO", () {
-                  Navigator.pop(context);
-
-                  Future.microtask(() {
-                    _iniciarNovoJogo(this.context);
-                  });
-                }, true),
-                SizedBox(height: 10),
-                _buildBotaoPixel("H15 TECNOLOGIA", () {
-                  Navigator.pop(context);
-                  _navegarPara(context, '/h15');
-                }, true),
-                SizedBox(height: 10),
-                _buildBotaoPixel("BIBLIOTECA", () {
-                    Navigator.pop(context);
-                    _navegarPara(context, '/biblioteca');
-                    }, true),
-                SizedBox(height: 10),
-                _buildBotaoPixel("PRAÇA", () {
-                  Navigator.pop(context);
-                  _navegarPara(context, '/refeitorio');
-                }, true),
-                SizedBox(height: 10),
-                _buildBotaoPixel("H12 ARQUITETURA", () {
-                  Navigator.pop(context);
-                  _navegarPara(context, '/h12');
-                }, true),
-                SizedBox(height: 10),
-                _buildBotaoPixel("MANACÁS (CAVE)", () {
-                  Navigator.pop(context);
-                  _navegarPara(context, '/manacas');
-                }, true),
-                SizedBox(height: 15),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Text(
-                    "CANCELAR",
-                    style: TextStyle(
-                      fontFamily: 'PixelifySans',
-                      color: Colors.white54,
-                      fontSize: 12,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildBotaoPixel(String texto, VoidCallback onTap, bool pequeno) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          vertical: pequeno ? 10 : 18,
-          horizontal: pequeno ? 25 : 55,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.blue[900],
-          border: Border.all(color: Colors.white, width: 3),
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [BoxShadow(color: Colors.black, offset: Offset(5, 5))],
-        ),
-        child: Text(
-          texto,
-          style: TextStyle(
-            fontSize: pequeno ? 14 : 18,
-            color: Colors.white,
-            fontFamily: 'PixelifySans',
-            letterSpacing: 2,
-          ),
-        ),
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-import '../tela_mapa_exploracao.dart';
+import '../5-Manacas/entrada_manacas.dart';
 import '../game_progress.dart';
 
 class TelaArquiteturaPOS extends StatefulWidget {
@@ -238,7 +238,7 @@ class _TelaArquiteturaPOSState
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        TelaMapaExploracao(),
+                        EntradaManacasScreen(),
                   ),
                 );
               },
@@ -560,7 +560,7 @@ class _TelaArquiteturaPOSState
                               MaterialPageRoute(
                                 builder:
                                     (context) =>
-                                        TelaMapaExploracao(),
+                                        EntradaManacasScreen(),
                               ),
                             );
                           },
@@ -598,7 +598,7 @@ class _TelaArquiteturaPOSState
                             ),
 
                             child: Text(
-                              'VOLTAR AO MAPA',
+                              'Ir para Manacas',
 
                               style: TextStyle(
                                 fontFamily:

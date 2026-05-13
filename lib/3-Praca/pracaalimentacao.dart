@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'minigame_pracaalimentacao.dart';
+import '../4-Arquitetura/arquiteturaOUT.dart';
 
 class Telapracaalimentacao extends StatefulWidget {
   const Telapracaalimentacao({super.key});
@@ -332,9 +333,14 @@ class _TelapracaalimentacaoState
         alignment: Alignment.bottomRight,
 
         child: ElevatedButton(
-          onPressed: () {
-
-            print("Voltar ao mapa");
+          onPressed: () async {
+            await _player.stop();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => TelaArquiteturaOUT(),
+              ),
+            );
 
           },
 
@@ -364,7 +370,7 @@ class _TelapracaalimentacaoState
           ),
 
           child: Text(
-            'Voltar ao mapa',
+            'Ir para Arquitetura',
 
             style: TextStyle(
               color: Colors.white,
@@ -548,7 +554,7 @@ class _TelapracaalimentacaoState
 
           Positioned.fill(
             child: Image.asset(
-              'assets/fundo/Praca/pracaalimentacao.jpeg',
+              'assets/fundo/Praca/pracaalimentacao.jpg',
               fit: BoxFit.cover,
             ),
           ),

@@ -7,12 +7,23 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GameProgress {
+  // ======================== H15 ========================
+
+  // Indica se o jogador concluiu a fase H15 (desbloqueia a Biblioteca).
+  static bool h15Concluida = false;
+
   // ======================== BIBLIOTECA ========================
 
   static bool bibliotecaDesbloqueada = false;
   static bool missaoCorujitoAceita = false;
   static bool livroCorujitoEncontrado = false;
   static bool livroCorujitoEntregue = false;
+
+  // ======================== PRAÇA DE ALIMENTAÇÃO ========================
+
+  // Desbloqueada quando a missão da biblioteca é concluída (livroCorujitoEntregue).
+  // Getter de conveniência — não precisa de campo separado.
+  static bool get pracaDesbloqueada => livroCorujitoEntregue;
 
   // ======================== ARQUITETURA ========================
 
@@ -22,12 +33,19 @@ class GameProgress {
   // Indica se o jogador concluiu toda a fase (puzzle + diálogo pós).
   static bool arquiteturaConcluida = false;
 
+  // ======================== MANACÁS ========================
+
+  // Desbloqueado quando a arquitetura é concluída.
+  // Getter de conveniência.
+  static bool get manacasDesbloqueada => arquiteturaConcluida;
+
   // ======================== SALVAR ========================
 
   /// Salva todo o progresso atual no localStorage (shared_preferences).
   static Future<void> salvar() async {
     final prefs = await SharedPreferences.getInstance();
 
+    await prefs.setBool('h15Concluida', h15Concluida);
     await prefs.setBool('bibliotecaDesbloqueada', bibliotecaDesbloqueada);
     await prefs.setBool('missaoCorujitoAceita', missaoCorujitoAceita);
     await prefs.setBool('livroCorujitoEncontrado', livroCorujitoEncontrado);
@@ -43,6 +61,8 @@ class GameProgress {
   static Future<void> carregar() async {
     final prefs = await SharedPreferences.getInstance();
 
+    h15Concluida =
+        prefs.getBool('h15Concluida') ?? false;
     bibliotecaDesbloqueada =
         prefs.getBool('bibliotecaDesbloqueada') ?? false;
     missaoCorujitoAceita =
@@ -55,6 +75,14 @@ class GameProgress {
         prefs.getBool('arquiteturaDesbloqueada') ?? false;
     arquiteturaConcluida =
         prefs.getBool('arquiteturaConcluida') ?? false;
+  }
+
+  // ======================== H15 — MÉTODOS ========================
+
+  /// Chamar ao final da fase H15 para desbloquear a Biblioteca.
+  static Future<void> concluirH15() async {
+    h15Concluida = true;
+    await salvar();
   }
 
   // ======================== BIBLIOTECA — MÉTODOS ========================
@@ -96,6 +124,7 @@ class GameProgress {
   // ======================== RESET ========================
 
   static Future<void> resetar() async {
+    h15Concluida = false;
     bibliotecaDesbloqueada = false;
     missaoCorujitoAceita = false;
     livroCorujitoEncontrado = false;
