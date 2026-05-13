@@ -102,18 +102,18 @@ class _MinigamePracaAlimentacaoState
   Map<String, dynamic> get pedido => pedidos[pedidoAtual];
 
   final Map<String, String> imagensIngredientes = {
-    'Pão de baixo': 'assets/fundo/Praca/paodebaixo.png',
-    'Pão de cima':  'assets/fundo/Praca/paodecima.png',
-    'Carne':        'assets/fundo/Praca/carne.png',
-    'Queijo':       'assets/fundo/Praca/queijo.png',
-    'Bacon':        'assets/fundo/Praca/bacon.png',
-    'Alface':       'assets/fundo/Praca/alface.png',
-    'Tomate':       'assets/fundo/Praca/tomate.png',
+    'Pão de baixo': 'assets/fundo/Praca/paodebaixoreto.png',
+    'Pão de cima':  'assets/fundo/Praca/paodecimareto.png',
+    'Carne':        'assets/fundo/Praca/carnereto.png',
+    'Queijo':       'assets/fundo/Praca/queijoreto.png',
+    'Bacon':        'assets/fundo/Praca/baconreto.png',
+    'Alface':       'assets/fundo/Praca/alfacereto.png',
+    'Tomate':       'assets/fundo/Praca/tomatereto.png',
     'Batata':       'assets/fundo/Praca/batata.png',
     'Refrigerante': 'assets/fundo/Praca/refri.png',
   };
 
-  // Altura de cada fatia do lanche na pilha
+// Altura VISUAL REAL de cada ingrediente
   final Map<String, double> alturasCamada = {
     'Pão de baixo': 70.0,
     'Pão de cima':  70.0,
@@ -123,13 +123,12 @@ class _MinigamePracaAlimentacaoState
     'Alface':       28.0,
     'Tomate':       28.0,
   };
-
   // Largura visual de cada camada
   final Map<String, double> largurasIngrediente = {
-    'Pão de baixo': 280.0,
-    'Pão de cima':  280.0,
-    'Carne':        220.0,
-    'Queijo':       210.0,
+    'Pão de baixo': 240.0,
+    'Pão de cima':  230.0,
+    'Carne':        200.0,
+    'Queijo':       180.0,
     'Bacon':        210.0,
     'Alface':       220.0,
     'Tomate':       215.0,
@@ -394,6 +393,7 @@ class _MinigamePracaAlimentacaoState
           ...() {
             List<Widget> widgets = [];
             double acumulado = 0.0;
+            const double espacamento = 18.0;
 
             // Percorre de cima para baixo (o último adicionado fica no topo da pilha)
             for (int i = camadas.length - 1; i >= 0; i--) {
@@ -409,13 +409,12 @@ class _MinigamePracaAlimentacaoState
                   child: Image.asset(
                     imagensIngredientes[item]!,
                     width: w,
-                    height: h,
-                    fit: BoxFit.fill,
+                    fit: BoxFit.contain,
                   ),
                 ),
               );
 
-              acumulado += h;
+              acumulado += espacamento;
             }
 
             return widgets;
