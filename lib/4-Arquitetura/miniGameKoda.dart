@@ -105,6 +105,9 @@ class _MiniGameKodaState extends State<MiniGameKoda> {
 
   // ================= DIALOGO FINAL =================
 
+  // O salvamento de progresso NÃO acontece aqui.
+  // Ele acontece no arquiteturaPOS ao clicar "VOLTAR AO MAPA",
+  // que é o ponto real de conclusão de toda a fase.
   void mostrarDialogoVitoria() {
     showDialog(
       context: context,
