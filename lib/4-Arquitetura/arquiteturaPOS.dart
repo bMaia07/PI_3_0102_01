@@ -1,28 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-import 'arquiteturaIN.dart';
 import '../tela_mapa_exploracao.dart';
 import '../game_progress.dart';
 
-class TelaArquiteturaOUT extends StatefulWidget {
+class TelaArquiteturaPOS extends StatefulWidget {
   @override
-  _TelaArquiteturaOUTState createState() =>
-      _TelaArquiteturaOUTState();
+  _TelaArquiteturaPOSState createState() =>
+      _TelaArquiteturaPOSState();
 }
 
-class _TelaArquiteturaOUTState
-    extends State<TelaArquiteturaOUT> {
+// ================= CLASSE DIALOGO =================
 
-  // 🎵 PLAYER
+class Dialogo {
+  final String texto;
+  final String personagem;
+  final String imagem;
+
+  Dialogo({
+    required this.texto,
+    required this.personagem,
+    required this.imagem,
+  });
+}
+
+class _TelaArquiteturaPOSState
+    extends State<TelaArquiteturaPOS> {
+
+  // ================= PLAYER =================
+
   final AudioPlayer _player = AudioPlayer();
+
   bool isMuted = false;
+
+  // ================= INIT =================
 
   @override
   void initState() {
     super.initState();
+
     tocarSom();
   }
+
+  // ================= SOM =================
 
   void tocarSom() async {
     await _player.setReleaseMode(ReleaseMode.loop);
@@ -37,7 +57,9 @@ class _TelaArquiteturaOUTState
       isMuted = !isMuted;
     });
 
-    await _player.setVolume(isMuted ? 0 : 1);
+    await _player.setVolume(
+      isMuted ? 0 : 1,
+    );
   }
 
   @override
@@ -46,14 +68,117 @@ class _TelaArquiteturaOUTState
     super.dispose();
   }
 
-  // 🗣️ LISTA DE FALAS
-  List<String> dialogos = [
-    "O jogador chega no prédio de arquitetura...",
-    "Ao caminhar pelos corredores, ouve ao fundo um resmungo vindo de uma das salas.",
-    "Quando encontra a sala de onde vem os barulhos, ele decide entrar.",
+  // ================= DIÁLOGOS =================
+
+  List<Dialogo> dialogos = [
+
+    Dialogo(
+      texto:
+          "Você conseguiu?! Deixa eu ver...\nIncrível! Perfeito! Cada ângulo, cada encaixe... você tem talento pra isso!",
+      personagem: "Koda",
+      imagem:
+          "assets/personagens/koda.png",
+    ),
+
+    Dialogo(
+      texto:
+          "Era só questão de lógica.",
+      personagem: "Jogador",
+      imagem:
+          "",
+    ),
+
+    Dialogo(
+      texto:
+          "Bom... agora que isso está resolvido... tem algo que está me preocupando muito.",
+      personagem: "Koda",
+      imagem:
+          "assets/personagens/koda.png",
+    ),
+
+    Dialogo(
+      texto:
+          "O que foi?",
+      personagem: "Jogador",
+      imagem:
+          "",
+    ),
+
+    Dialogo(
+      texto:
+          "A capivara... ela desapareceu. Simplesmente sumiu sem deixar rastros. E isso não é normal — ela sempre foi cuidadosa, metódica... quase como esses desenhos.",
+      personagem: "Koda",
+      imagem:
+          "assets/personagens/koda.png",
+    ),
+
+    Dialogo(
+      texto:
+          "Onde posso ir em busca dela?",
+      personagem: "Jogador",
+      imagem:
+          "",
+    ),
+
+    Dialogo(
+      texto:
+          "Um centro de estudos. Fica não muito longe daqui. Dizem que lá existe uma sala... completamente escura. Ninguém gosta de entrar lá. Pode ser que ela esteja por lá.",
+      personagem: "Koda",
+      imagem:
+          "assets/personagens/koda.png",
+    ),
+
+    Dialogo(
+      texto:
+          "Entendi. Vou dar uma olhada.",
+      personagem: "Jogador",
+      imagem:
+          "",
+    ),
+
+    Dialogo(
+      texto:
+          "Espere! Você me ajudou, então... eu também quero ajudar você.",
+      personagem: "Koda",
+      imagem:
+          "assets/personagens/koda.png",
+    ),
+
+    Dialogo(
+      texto:
+          "*O coala remexe em uma gaveta e tira um objeto brilhante*",
+      personagem: "Narrador",
+      imagem: "",
+    ),
+
+    Dialogo(
+      texto:
+          "Tome isto — um Esquadro Mágico.\nEle não é apenas uma ferramenta comum... ele pode revelar ângulos ocultos, caminhos invisíveis... e até ajudar em combates, se usado corretamente.",
+      personagem: "Koda",
+      imagem:
+          "assets/personagens/esquadroMagico.png",
+    ),
+
+    Dialogo(
+      texto:
+          "Interessante...",
+      personagem: "Jogador",
+      imagem:
+          "",
+    ),
+
+    Dialogo(
+      texto:
+          "Guarde bem. Tenho a sensação de que você vai precisar disso na batalha final.\nE... obrigado. De verdade.",
+      personagem: "Koda",
+      imagem:
+          "assets/personagens/koda.png",
+    ),
   ];
 
   int indiceAtual = 0;
+
+  // ================= PRÓXIMO DIÁLOGO =================
 
   void proximoDialogo() {
     if (indiceAtual < dialogos.length - 1) {
@@ -63,8 +188,12 @@ class _TelaArquiteturaOUTState
     }
   }
 
+  // ================= BUILD =================
+
   @override
   Widget build(BuildContext context) {
+
+    Dialogo atual = dialogos[indiceAtual];
 
     bool acabouDialogo =
         indiceAtual == dialogos.length - 1;
@@ -75,7 +204,8 @@ class _TelaArquiteturaOUTState
       body: Stack(
         children: [
 
-          // 🎨 FUNDO
+          // ================= FUNDO =================
+
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -87,12 +217,14 @@ class _TelaArquiteturaOUTState
             ),
           ),
 
-          // ESCURECER FUNDO
+          // ================= ESCURECER =================
+
           Container(
-            color: Colors.black.withOpacity(0.35),
+            color: Colors.black.withOpacity(0.45),
           ),
 
-          // 🔙 BOTÃO VOLTAR
+          // ================= BOTÃO VOLTAR =================
+
           Positioned(
             top: 40,
             left: 20,
@@ -186,23 +318,75 @@ class _TelaArquiteturaOUTState
             ),
           ),
 
-          // 🔈 BOTÃO DE SOM
+          // ================= BOTÃO DE SOM =================
+
           Positioned(
             top: 40,
             right: 20,
+
             child: IconButton(
               icon: Icon(
                 isMuted
                     ? Icons.volume_off
                     : Icons.volume_up,
+
                 color: Colors.white,
                 size: 30,
               ),
+
               onPressed: toggleSom,
             ),
           ),
 
-          // 💬 CAIXA DE DIÁLOGO
+          // ================= PERSONAGENS =================
+
+          if (atual.imagem.isNotEmpty)
+
+            // ================= KODA =================
+            if (
+              atual.personagem == "Koda" &&
+              atual.imagem !=
+                  "assets/personagens/esquadroMagico.png"
+            )
+              Positioned(
+                bottom: 220,
+                left: 30,
+
+                child: Image.asset(
+                  atual.imagem,
+                  height: 300,
+                ),
+              )
+
+            // ================= JOGADOR =================
+            //else if (atual.personagem == "Jogador")
+            //  Positioned(
+            //    bottom: 220,
+            /*    right: 30,
+
+                child: Image.asset(
+                  atual.imagem,
+                  height: 300,
+                ),
+              )
+            */
+            // ================= ESQUADRO =================
+            else
+              Positioned(
+                bottom: 250,
+                left: 0,
+                right: 0,
+
+                child: Center(
+                  child: Image.asset(
+                    atual.imagem,
+                    height: 240,
+                  ),
+                ),
+              ),
+
+          // ================= CAIXA DE DIÁLOGO =================
+
           Positioned(
             left: 40,
             right: 40,
@@ -252,12 +436,14 @@ class _TelaArquiteturaOUTState
 
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+
                   crossAxisAlignment:
                       CrossAxisAlignment.start,
 
                   children: [
 
-                    // NOME
+                    // ================= NOME =================
+
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 14,
@@ -292,14 +478,18 @@ class _TelaArquiteturaOUTState
                           SizedBox(width: 8),
 
                           Text(
-                            'NARRADOR',
+                            atual.personagem
+                                .toUpperCase(),
 
                             style: TextStyle(
                               fontFamily:
                                   'PixelifySans',
+
                               fontWeight:
                                   FontWeight.bold,
+
                               color: Colors.black,
+
                               fontSize: 14,
                             ),
                           ),
@@ -309,22 +499,27 @@ class _TelaArquiteturaOUTState
 
                     SizedBox(height: 16),
 
-                    // TEXTO
+                    // ================= TEXTO =================
+
                     Text(
-                      dialogos[indiceAtual],
+                      atual.texto,
 
                       style: TextStyle(
                         fontFamily:
                             'PixelifySans',
+
                         fontSize: 16,
+
                         color: Colors.white,
+
                         height: 1.5,
                       ),
                     ),
 
                     SizedBox(height: 14),
 
-                    // CONTINUAR
+                    // ================= CONTINUAR =================
+
                     if (!acabouDialogo)
                       Text(
                         '👆 Toque para continuar...',
@@ -332,6 +527,7 @@ class _TelaArquiteturaOUTState
                         style: TextStyle(
                           fontFamily:
                               'PixelifySans',
+
                           fontSize: 11,
 
                           color:
@@ -344,23 +540,27 @@ class _TelaArquiteturaOUTState
                         ),
                       ),
 
-                    // BOTÃO ENTRAR — salva que a arquitetura foi desbloqueada
+                    // ================= BOTÃO FINAL =================
+                    // Aqui é o ponto de conclusão da fase inteira.
+                    // Salva arquiteturaConcluida = true antes de voltar ao mapa.
+
                     if (acabouDialogo)
                       Center(
                         child: GestureDetector(
                           onTap: () async {
 
-                            // Marca que o jogador entrou no prédio de arquitetura
-                            await GameProgress.desbloquearArquitetura();
+                            // Salva que a fase de arquitetura foi concluída
+                            await GameProgress.concluirArquitetura();
 
                             await _player.stop();
 
                             Navigator.pushReplacement(
                               context,
+
                               MaterialPageRoute(
                                 builder:
                                     (context) =>
-                                        TelaArquiteturaIN(),
+                                        TelaMapaExploracao(),
                               ),
                             );
                           },
@@ -368,8 +568,8 @@ class _TelaArquiteturaOUTState
                           child: Container(
                             padding:
                                 EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
+                              horizontal: 24,
+                              vertical: 14,
                             ),
 
                             decoration:
@@ -398,11 +598,12 @@ class _TelaArquiteturaOUTState
                             ),
 
                             child: Text(
-                              'ENTRAR',
+                              'VOLTAR AO MAPA',
 
                               style: TextStyle(
                                 fontFamily:
                                     'PixelifySans',
+
                                 fontSize: 12,
 
                                 color:
@@ -411,7 +612,7 @@ class _TelaArquiteturaOUTState
                                   228,
                                   186,
                                   0,
-                                ).withOpacity(1),
+                                ),
                               ),
                             ),
                           ),

@@ -1,10 +1,6 @@
 // -----------------------------------------------------------------------------
-// Primeira cena da biblioteca. O jogador vê a fachada e só avança ao clicar
-// no marcador posicionado na rampa/entrada.
+// fachada
 // -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// ARQUIVO: biblioteca_fachada.dart
-// OBJETIVO: controlar a primeira tela da biblioteca, com marcador na rampa.
 // COMENTÁRIOS DETALHADOS:
 // - Usa BibliotecaSceneScaffold para manter fundo, música e botões iguais.
 // - Usa BibliotecaIndicadorEntrada para criar o ponto clicável.

@@ -1,14 +1,7 @@
 // -----------------------------------------------------------------------------
-// Cena do acervo da biblioteca. Aqui acontece o mini game do livro perdido:
-// o jogador investiga 4 corredores, coleta 4 partes da capa e monta o puzzle
-// do livro "O Segredo dos Animais".
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// ARQUIVO: biblioteca_acervo.dart
-// OBJETIVO: controlar o mini game do acervo da biblioteca.
-// O jogador investiga 4 corredores, coleta 4 pedaços da capa e depois monta
-// o puzzle do livro "O Segredo dos Animais".
-// COMENTÁRIOS DETALHADOS DO ACERVO:
+// mini game do livro perdido:
+// ----------------------------------------------------------------------------
+//  COMENTÁRIOS DETALHADOS DO ACERVO:
 // - _pedacosColetados guarda quais partes já foram encontradas.
 // - _investigarCorredor abre o popup de coleta de cada pedaço.
 // - _PuzzleLivroDialog é a janela onde o jogador arrasta as peças.

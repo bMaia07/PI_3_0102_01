@@ -14,6 +14,7 @@ class _TelapracaalimentacaoState
     extends State<Telapracaalimentacao> {
 
   int etapa = 0;
+
   final AudioPlayer _player = AudioPlayer();
 
   bool mutado = false;
@@ -25,11 +26,17 @@ class _TelapracaalimentacaoState
   }
 
   Future<void> tocarAudio() async {
+
     await _player.setVolume(1.0);
-    await _player.setReleaseMode(ReleaseMode.loop);
+
+    await _player.setReleaseMode(
+      ReleaseMode.loop,
+    );
 
     await _player.play(
-      AssetSource('audios/sompraca.mp3'),
+      AssetSource(
+        'audios/sompraca.mp3',
+      ),
     );
   }
 
@@ -40,15 +47,20 @@ class _TelapracaalimentacaoState
     });
 
     if (mutado) {
+
       await _player.setVolume(0.0);
+
     } else {
+
       await _player.setVolume(1.0);
     }
   }
 
   @override
   void dispose() {
+
     _player.dispose();
+
     super.dispose();
   }
 
@@ -56,47 +68,36 @@ class _TelapracaalimentacaoState
 
     switch (etapa) {
 
-      // NPC
       case 0:
         return '\nOlá criatura feia, em que posso te ajudar?';
 
-      // JOGADOR
       case 1:
         return 'Você:';
 
-      // NPC
       case 2:
         return '\nAh sim, tenho uma informação útil... mas só direi se completar um desafio!';
 
-      // JOGADOR
       case 3:
         return 'Você:';
 
-      // NPC
       case 4:
         return '\nVocê terá que fazer três hambúrgueres corretamente seguindo os pedidos!';
 
-      // JOGADOR
       case 5:
         return 'Você:';
 
-      // NPC
       case 6:
         return '\nMuito bem! O animal desaparecido foi visto com um hambúrguer, ele pediu um para ele e outro para seu amigo coala...';
 
-      // JOGADOR
       case 7:
         return 'Você:';
 
-      // NPC
       case 8:
         return '\nEle é muito bom em desenhos e prédios, acho que ele quer ser arquiteto.';
 
-      // JOGADOR
       case 9:
         return 'Você:';
 
-      // NPC
       case 10:
         return '\nBoa sorte!';
 
@@ -142,7 +143,6 @@ class _TelapracaalimentacaoState
 
             },
           ),
-
         ],
       );
     }
@@ -157,6 +157,8 @@ class _TelapracaalimentacaoState
             'Vamos nessa!',
                 () async {
 
+              await _player.stop();
+
               final venceu = await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -165,12 +167,13 @@ class _TelapracaalimentacaoState
                 ),
               );
 
+              await tocarAudio();
+
               if (venceu == true) {
 
                 setState(() {
                   etapa = 6;
                 });
-
               }
             },
           ),
@@ -198,6 +201,8 @@ class _TelapracaalimentacaoState
         'Vamos nessa',
             () async {
 
+          await _player.stop();
+
           final venceu = await Navigator.push(
             context,
             MaterialPageRoute(
@@ -206,12 +211,13 @@ class _TelapracaalimentacaoState
             ),
           );
 
+          await tocarAudio();
+
           if (venceu == true) {
 
             setState(() {
               etapa = 6;
             });
-
           }
         },
       );
@@ -266,7 +272,6 @@ class _TelapracaalimentacaoState
 
             },
           ),
-
         ],
       );
     }
@@ -321,7 +326,6 @@ class _TelapracaalimentacaoState
 
   Widget buildBotaoContinuar() {
 
-    // BOTÃO FINAL
     if (etapa == 10) {
 
       return Align(
@@ -372,7 +376,6 @@ class _TelapracaalimentacaoState
       );
     }
 
-    // NÃO MOSTRA CONTINUAR NAS ESCOLHAS
     if (
     etapa == 1 ||
         etapa == 3 ||
@@ -545,7 +548,7 @@ class _TelapracaalimentacaoState
 
           Positioned.fill(
             child: Image.asset(
-              'assets/fundo/Praça/pracaalimentacao.jpeg',
+              'assets/fundo/Praca/pracaalimentacao.jpeg',
               fit: BoxFit.cover,
             ),
           ),
@@ -572,14 +575,15 @@ class _TelapracaalimentacaoState
             child: buildDialogo(),
           ),
 
-          // BOTÃO VOLTAR
           Positioned(
             top: 40,
             left: 20,
 
             child: GestureDetector(
               onTap: () {
+
                 Navigator.pop(context);
+
               },
 
               child: Container(
@@ -615,7 +619,6 @@ class _TelapracaalimentacaoState
             ),
           ),
 
-          // BOTÃO MUTE
           Positioned(
             top: 40,
             right: 20,

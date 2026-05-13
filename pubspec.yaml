@@ -40,7 +40,7 @@ flutter:
     - assets/fundo/Biblioteca/
     - assets/fundo/H15/
     - assets/fundo/Manacas/
-    - assets/fundo/Praça/
+    - assets/fundo/Praca/
     - assets/fundo/     # Tela inicial
     - assets/personagens/manacas/
     # Personagens e vídeos dentro de fundo (ajuste os caminhos no código)
