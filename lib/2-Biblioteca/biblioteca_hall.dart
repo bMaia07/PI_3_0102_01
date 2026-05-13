@@ -1,10 +1,6 @@
 // -----------------------------------------------------------------------------
-// Segunda cena da biblioteca. Mostra o hall e encaminha o jogador para a área
-// principal por meio de um marcador clicável.
+// hall
 // -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// ARQUIVO: biblioteca_hall.dart
-// OBJETIVO: controlar a segunda tela da biblioteca, com marcador para avançar ao salão principal.
 // COMENTÁRIOS DETALHADOS:
 // - Usa BibliotecaSceneScaffold para manter fundo, música e botões iguais.
 // - Usa BibliotecaIndicadorEntrada para criar o ponto clicável.

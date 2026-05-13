@@ -824,18 +824,10 @@ class _TelaInicialState extends State<TelaInicial> {
                   _navegarPara(context, '/h15');
                 }, true),
                 SizedBox(height: 10),
-                _buildBotaoPixel(
-                    // A biblioteca só fica disponível no menu depois que o H15/Pingo libera.
-                    GameProgress.bibliotecaDesbloqueada
-                        ? "BIBLIOTECA"
-                        : "BIBLIOTECA 🔒", () {
-                  if (!GameProgress.bibliotecaDesbloqueada) {
-                    _mostrarBibliotecaBloqueadaDialogo();
-                    return;
-                  }
-                  Navigator.pop(context);
-                  _navegarPara(context, '/mapa_biblioteca');
-                }, true),
+                _buildBotaoPixel("BIBLIOTECA", () {
+                    Navigator.pop(context);
+                    _navegarPara(context, '/biblioteca');
+                    }, true),
                 SizedBox(height: 10),
                 _buildBotaoPixel("PRAÇA", () {
                   Navigator.pop(context);
