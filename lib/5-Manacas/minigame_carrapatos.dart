@@ -18,11 +18,12 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
   final int cliquesParaDerrotarMestre = 20;
   List<CarrapatoComum> carrapatosAtivos = [];
   Timer? spawnTimer;
+  Timer? ataqueMestreTimer;
   final Random random = Random();
 
-  // 👇 AJUSTE AQUI OS TEMPOS (segundos)
-  final double tempoVidaCarrapato = 2.0;   // tempo que ficam na tela
-  final double intervaloSpawm = 1.2;       // intervalo entre spawns
+  final double tempoVidaCarrapato = 2.0;
+  final double intervaloSpawm = 1.2;
+  final double intervaloAtaqueMestre = 2.0;
 
   @override
   void initState() {
@@ -53,6 +54,7 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
               vidaJogador--;
               if (vidaJogador <= 0) {
                 spawnTimer?.cancel();
+                ataqueMestreTimer?.cancel();
                 widget.onGameEnd(false);
               }
             }
@@ -68,6 +70,16 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
       faseMestre = true;
       carrapatosAtivos.clear();
     });
+    ataqueMestreTimer = Timer.periodic(Duration(seconds: intervaloAtaqueMestre.toInt()), (timer) {
+      if (!faseMestre) return;
+      setState(() {
+        vidaJogador--;
+        if (vidaJogador <= 0) {
+          timer.cancel();
+          widget.onGameEnd(false);
+        }
+      });
+    });
   }
 
   void clicarMestre() {
@@ -76,6 +88,8 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
       cliquesNoMestre++;
     });
     if (cliquesNoMestre >= cliquesParaDerrotarMestre) {
+      ataqueMestreTimer?.cancel();
+      // Vitória direta, sem exibir imagem de morte aqui
       widget.onGameEnd(true);
     }
   }
@@ -83,6 +97,7 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
   @override
   void dispose() {
     spawnTimer?.cancel();
+    ataqueMestreTimer?.cancel();
     super.dispose();
   }
 
@@ -143,7 +158,7 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
                         children: [
                           Image.asset(
                             'assets/personagens/manacas/carrapatao.png',
-                            width: 250,   // aumente/diminua aqui
+                            width: 250,
                             height: 250,
                           ),
                           SizedBox(height: 20),
@@ -160,6 +175,9 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
                               color: Colors.red,
                             ),
                           ),
+                          SizedBox(height: 10),
+                          Text("⚠️ Ele ataca a cada $intervaloAtaqueMestre segundos!",
+                              style: TextStyle(fontFamily: 'PixelifySans', color: Colors.orange)),
                         ],
                       ),
                     ),

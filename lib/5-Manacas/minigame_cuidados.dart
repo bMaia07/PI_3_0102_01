@@ -1,5 +1,5 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class MinigameCuidados extends StatefulWidget {
   final Function() onComplete;
@@ -11,23 +11,22 @@ class MinigameCuidados extends StatefulWidget {
 
 class _MinigameCuidadosState extends State<MinigameCuidados> {
   // Ações concluídas
-  bool banhoFeito = false;     // sujeira
-  bool folhasFeito = false;    // folhas
-  bool galhosFeito = false;    // galhos/espinhos
-  bool pomadaFeito = false;    // machucados
+  bool banhoFeito = false;
+  bool folhasFeito = false;
+  bool galhosFeito = false;
+  bool pomadaFeito = false;
   bool penteFeito = false;
   bool lacinhoFeito = false;
 
-  // Listas de elementos interativos
-  List<Offset> folhas = [];
-  List<Offset> sujeiras = [];
-  List<Offset> galhos = [];
-  List<Offset> machucados = [];
-
-  bool penteAplicado = false;
-  bool lacinhoAplicado = false;
+  bool allDone = false;
 
   final Random random = Random();
+
+  // Elementos interativos sobre a capivara
+  List<Offset> sujeiras = [];
+  List<Offset> folhas = [];
+  List<Offset> galhos = [];
+  List<Offset> machucados = [];
 
   @override
   void initState() {
@@ -36,22 +35,18 @@ class _MinigameCuidadosState extends State<MinigameCuidados> {
   }
 
   void _gerarPosicoes() {
-    // 3 folhas
-    folhas = List.generate(3, (_) => Offset(
-      80 + random.nextDouble() * 240,
-      150 + random.nextDouble() * 220,
-    ));
-    // 3 manchas de sujeira
     sujeiras = List.generate(3, (_) => Offset(
-      100 + random.nextDouble() * 220,
+      100 + random.nextDouble() * 200,
       160 + random.nextDouble() * 200,
     ));
-    // 2 galhos/espinhos
+    folhas = List.generate(3, (_) => Offset(
+      80 + random.nextDouble() * 240,
+      150 + random.nextDouble() * 200,
+    ));
     galhos = List.generate(2, (_) => Offset(
       90 + random.nextDouble() * 100,
       300 + random.nextDouble() * 80,
     ));
-    // 2 machucados (feridas)
     machucados = List.generate(2, (_) => Offset(
       140 + random.nextDouble() * 180,
       180 + random.nextDouble() * 150,
@@ -60,47 +55,56 @@ class _MinigameCuidadosState extends State<MinigameCuidados> {
 
   void _verificarConclusao() {
     if (banhoFeito && folhasFeito && galhosFeito && pomadaFeito && penteFeito && lacinhoFeito) {
-      widget.onComplete();
+      setState(() {
+        allDone = true;
+      });
     }
   }
 
-  void _removerFolha(Offset pos) {
-    setState(() {
-      folhas.remove(pos);
-      if (folhas.isEmpty) folhasFeito = true;
-    });
-    _verificarConclusao();
+  void _aplicarBanho() {
+    if (!banhoFeito) {
+      setState(() {
+        sujeiras.clear();
+        banhoFeito = true;
+      });
+      _verificarConclusao();
+    }
   }
 
-  void _removerSujeira(Offset pos) {
-    setState(() {
-      sujeiras.remove(pos);
-      if (sujeiras.isEmpty) banhoFeito = true;
-    });
-    _verificarConclusao();
+  void _aplicarFolha() {
+    if (!folhasFeito) {
+      setState(() {
+        folhas.clear();
+        folhasFeito = true;
+      });
+      _verificarConclusao();
+    }
   }
 
-  void _removerGalho(Offset pos) {
-    setState(() {
-      galhos.remove(pos);
-      if (galhos.isEmpty) galhosFeito = true;
-    });
-    _verificarConclusao();
+  void _aplicarGalho() {
+    if (!galhosFeito) {
+      setState(() {
+        galhos.clear();
+        galhosFeito = true;
+      });
+      _verificarConclusao();
+    }
   }
 
-  void _removerMachucado(Offset pos) {
-    setState(() {
-      machucados.remove(pos);
-      if (machucados.isEmpty) pomadaFeito = true;
-    });
-    _verificarConclusao();
+  void _aplicarPomada() {
+    if (!pomadaFeito) {
+      setState(() {
+        machucados.clear();
+        pomadaFeito = true;
+      });
+      _verificarConclusao();
+    }
   }
 
   void _aplicarPente() {
     if (!penteFeito) {
       setState(() {
         penteFeito = true;
-        penteAplicado = true;
       });
       _verificarConclusao();
     }
@@ -110,7 +114,6 @@ class _MinigameCuidadosState extends State<MinigameCuidados> {
     if (!lacinhoFeito) {
       setState(() {
         lacinhoFeito = true;
-        lacinhoAplicado = true;
       });
       _verificarConclusao();
     }
@@ -118,11 +121,55 @@ class _MinigameCuidadosState extends State<MinigameCuidados> {
 
   @override
   Widget build(BuildContext context) {
+    // Tela final após todos os cuidados
+    if (allDone) {
+      return Container(
+        color: Colors.brown.shade900,
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/fundo/Manacas/sala_principal_cap.jpeg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Container(color: Colors.black.withOpacity(0.5)),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/personagens/manacas/capivara_bem.png',
+                    height: 300,
+                    errorBuilder: (_, __, ___) => Icon(Icons.pets, size: 150),
+                  ),
+                  SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: () {
+                      widget.onComplete();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(38, 23, 23, 1),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text("Voltar à sala principal", style: TextStyle(fontFamily: 'PixelifySans', fontSize: 18)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Tela principal do minigame com drag & drop
     return Container(
       color: Colors.brown.shade900,
       child: Stack(
         children: [
-          // Fundo da caverna
+          // Fundo
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -133,86 +180,56 @@ class _MinigameCuidadosState extends State<MinigameCuidados> {
           ),
           Container(color: Colors.black.withOpacity(0.5)),
 
-          // Capivara (centralizada)
+          // DragTarget (a capivara) - recebe os itens arrastados
           Center(
-            child: Stack(
-              children: [
-                Image.asset(
-                  'assets/personagens/manacas/capivara_machucada.png',
-                  height: 400,
-                  errorBuilder: (_, __, ___) => Container(height: 400, color: Colors.brown),
-                ),
-                // Sujeiras (manchas)
-                ...sujeiras.map((pos) => Positioned(
-                  left: pos.dx,
-                  top: pos.dy,
-                  child: GestureDetector(
-                    onTap: () => _removerSujeira(pos),
-                    child: Image.asset(
-                      'assets/personagens/manacas/sujeira.png',
-                      width: 35,
-                      height: 35,
+            child: DragTarget<String>(
+              onAccept: (data) {
+                if (data == "sabao") _aplicarBanho();
+                if (data == "folha") _aplicarFolha();
+                if (data == "galho") _aplicarGalho();
+                if (data == "pomada") _aplicarPomada();
+                if (data == "pente") _aplicarPente();
+                if (data == "laco") _aplicarLacinho();
+              },
+              builder: (context, candidateData, rejectedData) {
+                return Stack(
+                  children: [
+                    Image.asset(
+                      'assets/personagens/manacas/capivara_machucada.png',
+                      height: 400,
+                      errorBuilder: (_, __, ___) => Container(height: 400, color: Colors.brown),
                     ),
-                  ),
-                )),
-                // Folhas
-                ...folhas.map((pos) => Positioned(
-                  left: pos.dx,
-                  top: pos.dy,
-                  child: GestureDetector(
-                    onTap: () => _removerFolha(pos),
-                    child: Image.asset(
-                      'assets/personagens/manacas/folha.png',
-                      width: 35,
-                      height: 35,
-                    ),
-                  ),
-                )),
-                // Galhos/espinhos
-                ...galhos.map((pos) => Positioned(
-                  left: pos.dx,
-                  top: pos.dy,
-                  child: GestureDetector(
-                    onTap: () => _removerGalho(pos),
-                    child: Image.asset(
-                      'assets/personagens/manacas/galho.png',
-                      width: 35,
-                      height: 35,
-                    ),
-                  ),
-                )),
-                // Machucados (feridas)
-                ...machucados.map((pos) => Positioned(
-                  left: pos.dx,
-                  top: pos.dy,
-                  child: GestureDetector(
-                    onTap: () => _removerMachucado(pos),
-                    child: Image.asset(
-                      'assets/personagens/manacas/machucado.png',
-                      width: 35,
-                      height: 35,
-                    ),
-                  ),
-                )),
-                // Pente aplicado
-                if (penteAplicado)
-                  Positioned(
-                    left: 180,
-                    top: 200,
-                    child: Image.asset('assets/personagens/manacas/pente.png', width: 40, height: 40),
-                  ),
-                // Lacinho aplicado
-                if (lacinhoAplicado)
-                  Positioned(
-                    left: 210,
-                    top: 120,
-                    child: Image.asset('assets/personagens/manacas/laco.png', width: 35, height: 35),
-                  ),
-              ],
+                    // Sujeiras
+                    ...sujeiras.map((pos) => Positioned(
+                      left: pos.dx,
+                      top: pos.dy,
+                      child: Image.asset('assets/personagens/manacas/sujeira.png', width: 35, height: 35),
+                    )),
+                    // Folhas
+                    ...folhas.map((pos) => Positioned(
+                      left: pos.dx,
+                      top: pos.dy,
+                      child: Image.asset('assets/personagens/manacas/folha.png', width: 35, height: 35),
+                    )),
+                    // Galhos
+                    ...galhos.map((pos) => Positioned(
+                      left: pos.dx,
+                      top: pos.dy,
+                      child: Image.asset('assets/personagens/manacas/galho.png', width: 35, height: 35),
+                    )),
+                    // Machucados
+                    ...machucados.map((pos) => Positioned(
+                      left: pos.dx,
+                      top: pos.dy,
+                      child: Image.asset('assets/personagens/manacas/machucado.png', width: 35, height: 35),
+                    )),
+                  ],
+                );
+              },
             ),
           ),
 
-          // Botões das ações (barra rolável inferior)
+          // Barra inferior com itens arrastáveis
           Positioned(
             bottom: 20,
             left: 0,
@@ -222,84 +239,18 @@ class _MinigameCuidadosState extends State<MinigameCuidados> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _botaoAcao(
-                    icone: 'assets/personagens/manacas/sabao.png',
-                    texto: "Limpar sujeira",
-                    concluido: banhoFeito,
-                    onTap: () {
-                      if (!banhoFeito && sujeiras.isEmpty) {
-                        setState(() { banhoFeito = true; });
-                        _verificarConclusao();
-                      } else if (!banhoFeito) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Clique nas manchas de sujeira!"), duration: Duration(seconds: 1)),
-                        );
-                      }
-                    },
-                  ),
-                  _botaoAcao(
-                    icone: 'assets/personagens/manacas/folha.png',
-                    texto: "Tirar folhas",
-                    concluido: folhasFeito,
-                    onTap: () {
-                      if (!folhasFeito && folhas.isEmpty) {
-                        setState(() { folhasFeito = true; });
-                        _verificarConclusao();
-                      } else if (!folhasFeito) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Clique nas folhas!"), duration: Duration(seconds: 1)),
-                        );
-                      }
-                    },
-                  ),
-                  _botaoAcao(
-                    icone: 'assets/personagens/manacas/galho.png',
-                    texto: "Remover galhos",
-                    concluido: galhosFeito,
-                    onTap: () {
-                      if (!galhosFeito && galhos.isEmpty) {
-                        setState(() { galhosFeito = true; });
-                        _verificarConclusao();
-                      } else if (!galhosFeito) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Clique nos galhos/espinhos!"), duration: Duration(seconds: 1)),
-                        );
-                      }
-                    },
-                  ),
-                  _botaoAcao(
-                    icone: 'assets/personagens/manacas/pomada.png',
-                    texto: "Aplicar pomada",
-                    concluido: pomadaFeito,
-                    onTap: () {
-                      if (!pomadaFeito && machucados.isEmpty) {
-                        setState(() { pomadaFeito = true; });
-                        _verificarConclusao();
-                      } else if (!pomadaFeito) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Clique nas feridas (machucados)!"), duration: Duration(seconds: 1)),
-                        );
-                      }
-                    },
-                  ),
-                  _botaoAcao(
-                    icone: 'assets/personagens/manacas/pente.png',
-                    texto: "Pentear",
-                    concluido: penteFeito,
-                    onTap: _aplicarPente,
-                  ),
-                  _botaoAcao(
-                    icone: 'assets/personagens/manacas/laco.png',
-                    texto: "Colocar laço",
-                    concluido: lacinhoFeito,
-                    onTap: _aplicarLacinho,
-                  ),
+                  _buildDraggableItem('assets/personagens/manacas/sabao.png', 'sabao', banhoFeito, "Limpar sujeira"),
+                  _buildDraggableItem('assets/personagens/manacas/folha.png', 'folha', folhasFeito, "Tirar folhas"),
+                  _buildDraggableItem('assets/personagens/manacas/galho.png', 'galho', galhosFeito, "Remover galhos"),
+                  _buildDraggableItem('assets/personagens/manacas/pomada.png', 'pomada', pomadaFeito, "Aplicar pomada"),
+                  _buildDraggableItem('assets/personagens/manacas/pente.png', 'pente', penteFeito, "Pentear"),
+                  _buildDraggableItem('assets/personagens/manacas/laco.png', 'laco', lacinhoFeito, "Colocar laço"),
                 ],
               ),
             ),
           ),
 
-          // Indicador de progresso (agora /6)
+          // Indicador de progresso
           Positioned(
             top: 40,
             left: 20,
@@ -317,29 +268,75 @@ class _MinigameCuidadosState extends State<MinigameCuidados> {
     );
   }
 
-  Widget _botaoAcao({required String icone, required String texto, required bool concluido, required VoidCallback onTap}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: GestureDetector(
-        onTap: concluido ? null : onTap,
+  Widget _buildDraggableItem(String asset, String tag, bool alreadyDone, String hint) {
+    if (alreadyDone) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             Container(
               width: 70,
               height: 70,
               decoration: BoxDecoration(
-                color: concluido ? Colors.green : Colors.white,
+                color: Colors.green,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.cyanAccent, width: 2),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.asset(icone, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Icon(Icons.image_not_supported)),
+                child: Image.asset(asset, fit: BoxFit.cover),
               ),
             ),
-            SizedBox(height: 5),
-            Text(texto, style: TextStyle(fontFamily: 'PixelifySans', color: Colors.white, fontSize: 11)),
-            if (concluido) Icon(Icons.check_circle, color: Colors.green, size: 18),
+            Text(hint, style: TextStyle(fontFamily: 'PixelifySans', color: Colors.white70, fontSize: 10)),
+            Icon(Icons.check, color: Colors.white, size: 16),
+          ],
+        ),
+      );
+    }
+
+    return Draggable<String>(
+      data: tag,
+      feedback: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: 70,
+          height: 70,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.cyanAccent, width: 2),
+          ),
+          child: Image.asset(asset, fit: BoxFit.cover),
+        ),
+      ),
+      childWhenDragging: Opacity(
+        opacity: 0.5,
+        child: Container(
+          width: 70,
+          height: 70,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.cyanAccent, width: 2),
+          ),
+          child: Image.asset(asset, fit: BoxFit.cover),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Container(
+              width: 70,
+              height: 70,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.cyanAccent, width: 2),
+              ),
+              child: Image.asset(asset, fit: BoxFit.cover),
+            ),
+            Text(hint, style: TextStyle(fontFamily: 'PixelifySans', color: Colors.white, fontSize: 10)),
           ],
         ),
       ),

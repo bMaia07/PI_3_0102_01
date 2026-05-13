@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'corredor_manacas.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-// Áudio global (compartilhado com as outras telas)
 final AudioPlayer _manacasPlayer = AudioPlayer();
 
 Future<void> iniciarMusicaManacas() async {
@@ -47,18 +46,11 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
   @override
   void initState() {
     super.initState();
-    // Tenta iniciar a música (pode ser bloqueado por autoplay no Chrome)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       iniciarMusicaManacas().catchError((e) {
-        print("Autoplay bloqueado. Clique em algum lugar para ativar som.");
+        print("Autoplay bloqueado.");
       });
     });
-  }
-
-  @override
-  void dispose() {
-    // Não para a música ao sair da tela, pois ela continua no corredor/sala
-    super.dispose();
   }
 
   @override
@@ -76,10 +68,9 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
               ),
             ),
           ),
-          // Overlay escuro (igual ao H15)
           Container(color: Colors.black.withOpacity(0.3)),
 
-          // Botão MUTE (padronizado)
+          // Botão MUTE
           Positioned(
             top: 50,
             right: 20,
@@ -89,19 +80,19 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(38, 23, 23, 1),
-                  border: Border.all(color: const Color.fromRGBO(65, 26, 26, 1), width: 2),
+                  border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   isMuted ? Icons.volume_off : Icons.volume_up,
-                  color: const Color.fromARGB(255, 255, 255, 255),
+                  color: Colors.white,
                   size: 24,
                 ),
               ),
             ),
           ),
 
-          // Botão VOLTAR (padronizado)
+          // Botão VOLTAR
           Positioned(
             top: 50,
             left: 20,
@@ -114,42 +105,60 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(38, 23, 23, 1),
-                  border: Border.all(color: const Color.fromRGBO(65, 26, 26, 1), width: 2),
+                  border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.arrow_back, color: const Color.fromRGBO(65, 26, 26, 1), size: 18),
+                    Icon(Icons.arrow_back, color: Color.fromRGBO(65, 26, 26, 1), size: 18),
                     SizedBox(width: 6),
                     Text('VOLTAR',
                         style: TextStyle(
                             fontFamily: 'PixelifySans',
                             fontSize: 12,
-                            color: const Color.fromARGB(255, 255, 255, 255))),
+                            color: Colors.white)),
                   ],
                 ),
               ),
             ),
           ),
 
-          // Pegadas para avançar
+          // Pegadas (sempre visíveis)
           Positioned(
             bottom: 200,
             right: 650,
             child: GestureDetector(
               onTap: () async {
-                // Garante que a música esteja tocando
                 if (isMuted) toggleMute();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (_) => const CorredorManacasScreen()),
+                  MaterialPageRoute(builder: (_) => const CorredorManacasScreen()),
                 );
               },
               child: Image.asset(
                 'assets/fundo/Manacas/pegadas.png',
                 width: 170,
                 height: 130,
+              ),
+            ),
+          ),
+
+          // Caixa de diálogo FIXA na parte inferior
+          Positioned(
+            bottom: 30,   // 👈 bem embaixo
+            left: 20,
+            right: 20,
+            child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(38, 23, 23, 0.95),
+                border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                "🧑‍🦱 Nossa, o que aconteceu aqui?",
+                style: TextStyle(fontFamily: 'PixelifySans', fontSize: 18, color: Colors.white),
+                textAlign: TextAlign.center,
               ),
             ),
           ),

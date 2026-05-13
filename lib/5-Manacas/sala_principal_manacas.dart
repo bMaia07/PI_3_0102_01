@@ -3,7 +3,7 @@ import 'minigame_carrapatos.dart';
 import 'minigame_cuidados.dart';
 import 'entrada_manacas.dart';
 
-enum Fase { dialogoPre, combateCarrapatos, dialogoPosCombate, cuidados, missaoConcluida }
+enum Fase { dialogoPre, combateCarrapatos, dialogoPosCombate, cuidados }
 
 class SalaPrincipalManacasScreen extends StatefulWidget {
   const SalaPrincipalManacasScreen({super.key});
@@ -19,6 +19,19 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
     "Carrapato do Mal: Vamos acabar com você!",
     "Capivarilda: Cuidado! Eles são traiçoeiros!",
   ];
+
+  bool isMuted = false;
+
+  void toggleMute() {
+    setState(() {
+      isMuted = !isMuted;
+    });
+    if (isMuted) {
+      pausarMusicaManacas();
+    } else {
+      retomarMusicaManacas();
+    }
+  }
 
   void avancarDialogoPre() {
     if (dialogoPreIndex < dialogosPre.length - 1) {
@@ -41,7 +54,9 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
   }
 
   void concluirCuidados() {
-    setState(() => faseAtual = Fase.missaoConcluida);
+    // Após terminar os cuidados, volta direto para o menu principal
+    pararMusicaManacas();
+    Navigator.popUntil(context, (route) => route.isFirst);
   }
 
   void _exibirDerrota(String msg) {
@@ -86,45 +101,74 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
             ),
           ),
           Container(color: Colors.black.withOpacity(0.4)),
+
+          // Botão MUTE
+          Positioned(
+            top: 50,
+            right: 20,
+            child: GestureDetector(
+              onTap: toggleMute,
+              child: Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(38, 23, 23, 1),
+                  border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  isMuted ? Icons.volume_off : Icons.volume_up,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
+
+          // Imagem da Capivarilda atacada (apenas durante diálogo pré-combate)
+          if (faseAtual == Fase.dialogoPre)
+            Positioned(
+              top: 100,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Image.asset(
+                  'assets/personagens/manacas/Capivarilda_atacada.png',
+                  height: 250,
+                  errorBuilder: (_, __, ___) => Container(height: 250, color: Colors.transparent),
+                ),
+              ),
+            ),
+
+          // Carrapato morto (durante o diálogo de derrota)
+          if (faseAtual == Fase.dialogoPosCombate)
+            Positioned(
+              top: 120,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Image.asset(
+                  'assets/personagens/manacas/carrapato_morto.png',
+                  height: 200,
+                  errorBuilder: (_, __, ___) => Container(),
+                ),
+              ),
+            ),
+
           if (faseAtual == Fase.dialogoPre)
             _buildDialogoPixel(dialogosPre[dialogoPreIndex], avancarDialogoPre),
+
           if (faseAtual == Fase.combateCarrapatos)
             MinigameCarrapatos(onGameEnd: fimCombateCarrapatos),
+
           if (faseAtual == Fase.dialogoPosCombate)
             _buildDialogoPixel(
               "🐗 Carrapato Mestre: Que... impossível!\n\n🐾 Capivarilda: Você conseguiu! Agora preciso de seus cuidados...",
               avancarDialogoPos,
             ),
+
           if (faseAtual == Fase.cuidados)
             MinigameCuidados(onComplete: concluirCuidados),
-          if (faseAtual == Fase.missaoConcluida)
-            Center(
-              child: Container(
-                padding: EdgeInsets.all(30),
-                decoration: BoxDecoration(
-                  color: Color.fromRGBO(38, 23, 23, 1),
-                  border: Border.all(color: const Color.fromRGBO(65, 26, 26, 1), width: 4),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset('assets/personagens/manacas/capivara_bem.png', height: 150, errorBuilder: (_, __, ___) => Icon(Icons.pets, size: 100)),
-                    SizedBox(height: 20),
-                    Text("MISSÃO CONCLUÍDA!", style: TextStyle(fontFamily: 'PixelifySans', fontSize: 24, color: Colors.greenAccent)),
-                    Text("Você salvou e cuidou da Capivarilda!", style: TextStyle(fontFamily: 'PixelifySans', color: Colors.white)),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await pararMusicaManacas();
-                        if (mounted) Navigator.popUntil(context, (route) => route.isFirst);
-                      },
-                      child: Text("Voltar ao Menu", style: TextStyle(fontFamily: 'PixelifySans')),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+
           if (faseAtual == Fase.dialogoPre || faseAtual == Fase.dialogoPosCombate)
             Positioned(
               top: 20,
@@ -146,8 +190,8 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
         child: Container(
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Color.fromRGBO(38, 23, 23, 1).withOpacity(0.95),
-            border: Border.all(color: const Color.fromRGBO(65, 26, 26, 1), width: 3),
+            color: Color.fromRGBO(38, 23, 23, 0.95),
+            border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 3),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
@@ -168,14 +212,14 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Color.fromRGBO(38, 23, 23, 1),
-          border: Border.all(color: const Color.fromRGBO(65, 26, 26, 1), width: 2),
+          border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 2),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
-            Icon(Icons.arrow_back, color: const Color.fromRGBO(65, 26, 26, 1)),
+            Icon(Icons.arrow_back, color: Color.fromRGBO(65, 26, 26, 1)),
             SizedBox(width: 6),
-            Text("VOLTAR", style: TextStyle(fontFamily: 'PixelifySans', color: const Color.fromARGB(255, 255, 255, 255))),
+            Text("VOLTAR", style: TextStyle(fontFamily: 'PixelifySans', color: Colors.white)),
           ],
         ),
       ),
