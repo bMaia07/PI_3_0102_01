@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         // Rota chamada quando o jogador finalmente entra no ambiente da biblioteca.
         '/biblioteca': (context) => BibliotecaFachadaScreen(),
         '/refeitorio': (context) => Telapracaalimentacao(),
-        '/manacas': (context) => EntradaScreen(),
+        '/manacas': (context) => EntradaManacasScreen(),
       },
     );
   }
