@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'minigame_pracaalimentacao.dart';
-import '../4-Arquitetura/arquiteturaOUT.dart';
+import '../4-Arquitetura/TelaMapaArquitetura.dart';
 
 class Telapracaalimentacao extends StatefulWidget {
   const Telapracaalimentacao({super.key});
@@ -338,7 +338,7 @@ class _TelapracaalimentacaoState
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => TelaArquiteturaOUT(),
+                builder: (_) => const TelaMapaArquitetura(),
               ),
             );
 
@@ -370,7 +370,7 @@ class _TelapracaalimentacaoState
           ),
 
           child: Text(
-            'Ir para Arquitetura',
+            'Ir para a próxima fase',
 
             style: TextStyle(
               color: Colors.white,
