@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-import '../5-Manacas/entrada_manacas.dart';
+import '../5-Manacas/TelaMapaManacas.dart';
 import '../game_progress.dart';
 
 class TelaArquiteturaPOS extends StatefulWidget {
@@ -238,7 +238,7 @@ class _TelaArquiteturaPOSState
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        EntradaManacasScreen(),
+                        TelaMapaManacas(),
                   ),
                 );
               },
@@ -560,7 +560,7 @@ class _TelaArquiteturaPOSState
                               MaterialPageRoute(
                                 builder:
                                     (context) =>
-                                        EntradaManacasScreen(),
+                                        TelaMapaManacas(),
                               ),
                             );
                           },

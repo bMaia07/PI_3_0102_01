@@ -18,7 +18,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 
-import 'player_data.dart';
+import 'package:arquivocapivara_app/player_data.dart';
+import 'package:arquivocapivara_app/game_progress.dart';
 
 class TelaMapaBiblioteca extends StatefulWidget {
   const TelaMapaBiblioteca({super.key});
@@ -54,9 +55,9 @@ class _TelaMapaBibliotecaState extends State<TelaMapaBiblioteca> {
   bool _entrandoNaBiblioteca = false;
   double _zoomAtual = 17;
 
-  // Raio de liberação: o jogador precisa estar até 35m da Corujita para entrar.
+  // Raio de liberação: o jogador precisa estar até 25m da Corujita para entrar.
   // Distância máxima em metros para permitir entrar na biblioteca clicando na Corujita.
-  static const double _distanciaMinimaEntrada = 35;
+  static const double _distanciaMinimaEntrada = 25;
 
   // Ajusta o tamanho dos ícones quando o zoom do mapa muda.
   double _calcularTamanho(double base) {
@@ -68,6 +69,14 @@ class _TelaMapaBibliotecaState extends State<TelaMapaBiblioteca> {
   @override
   void initState() {
     super.initState();
+    _carregarProgressoEIniciar();
+  }
+
+  // Carrega o progresso salvo antes de iniciar a geolocalização,
+  // garantindo que GameProgress reflita o estado mais recente do localStorage.
+  Future<void> _carregarProgressoEIniciar() async {
+    await GameProgress.carregar();
+    if (mounted) setState(() {});
     _iniciarLocalizacaoTempoReal();
   }
 
@@ -139,6 +148,19 @@ class _TelaMapaBibliotecaState extends State<TelaMapaBiblioteca> {
 
   // Clicar na Corujita só abre a biblioteca se o jogador estiver dentro do raio.
   void _clicarCorujita() {
+    // Pré-requisito: a fase H15 precisa estar concluída.
+    if (!GameProgress.h15Concluida) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            '🐧 Você precisa concluir a fase do Pingo (H15) antes de acessar a Biblioteca!',
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
     final distancia = _calcularDistancia();
 
     if (distancia <= _distanciaMinimaEntrada) {
@@ -173,6 +195,7 @@ class _TelaMapaBibliotecaState extends State<TelaMapaBiblioteca> {
   @override
   Widget build(BuildContext context) {
     final distancia = _calcularDistancia();
+    final bool faseBloqueada = !GameProgress.h15Concluida;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -237,12 +260,15 @@ class _TelaMapaBibliotecaState extends State<TelaMapaBiblioteca> {
                     height: _calcularTamanho(54),
                     child: GestureDetector(
                       onTap: _clicarCorujita,
-                      child: Image.asset(
-                        'assets/personagens/corujito.png',
-                        width: _calcularTamanho(70),
-                        height: _calcularTamanho(70),
-                        filterQuality: FilterQuality.none,
-                        isAntiAlias: false,
+                      child: Opacity(
+                        opacity: faseBloqueada ? 0.45 : 1.0,
+                        child: Image.asset(
+                          'assets/personagens/corujito.png',
+                          width: _calcularTamanho(70),
+                          height: _calcularTamanho(70),
+                          filterQuality: FilterQuality.none,
+                          isAntiAlias: false,
+                        ),
                       ),
                     ),
                   ),
@@ -258,7 +284,10 @@ class _TelaMapaBibliotecaState extends State<TelaMapaBiblioteca> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.72),
-                border: Border.all(color: Colors.cyanAccent, width: 2),
+                border: Border.all(
+                  color: faseBloqueada ? Colors.redAccent : Colors.cyanAccent,
+                  width: 2,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
@@ -269,11 +298,18 @@ class _TelaMapaBibliotecaState extends State<TelaMapaBiblioteca> {
                     style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    '🦉 Vá até a biblioteca e clique na Corujita para entrar!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.cyanAccent),
-                  ),
+                  if (faseBloqueada)
+                    const Text(
+                      '🔒 Conclua a fase do Pingo (H15) para desbloquear a Biblioteca!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.redAccent),
+                    )
+                  else
+                    const Text(
+                      '🦉 Vá até a biblioteca e clique na Corujita para entrar!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.cyanAccent),
+                    ),
                   const SizedBox(height: 4),
                   Text(
                     'Distância até a biblioteca: ${distancia.toStringAsFixed(0)}m',

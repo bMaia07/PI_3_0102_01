@@ -6,7 +6,7 @@ import '../0-Tela_Inicial/tela_inicial.dart';
 import '../1-H15/tela_h15.dart';
 import '../4-Arquitetura/arquiteturaOUT.dart';
 import 'tela_mapa_exploracao.dart';
-import 'tela_mapa_biblioteca.dart';
+import '2-Biblioteca/tela_mapa_biblioteca.dart';
 import '../5-Manacas/entrada_manacas.dart';
 import '3-Praca/pracaalimentacao.dart';
 import '../2-Biblioteca/biblioteca_fachada.dart';

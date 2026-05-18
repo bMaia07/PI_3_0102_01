@@ -46,6 +46,12 @@ class _TelaMapaExploracaoState extends State<TelaMapaExploracao> {
   String _nomeSave = 'Save';
   bool _dadosCarregados = false;
 
+  // Impede navegação dupla caso o GPS dispare dois eventos seguidos dentro do raio.
+  bool _entrandoNoH15 = false;
+
+  // Raio de liberação: o jogador precisa estar até 25m do Pingo para entrar.
+  static const double _distanciaMinimaEntrada = 25;
+
   // 🔥 GEOLOCALIZAÇÃO
   StreamSubscription<html.Geoposition>? _geoSubscription;
 
@@ -93,7 +99,6 @@ class _TelaMapaExploracaoState extends State<TelaMapaExploracao> {
           _primeiraLocalizacao = false;
         }
 
-        _verificarProximidade();
       }
     });
   }
@@ -107,12 +112,29 @@ class _TelaMapaExploracaoState extends State<TelaMapaExploracao> {
     );
   }
 
-  // ================= 🎯 CHEGOU =================
-  void _verificarProximidade() {
-    // Libera a entrada no H15 quando o jogador está dentro do raio definido.
-    if (_calcularDistancia() < 30) {
+  // ================= 🎯 CLIQUE NO PINGO =================
+  // Ao clicar no Pingo, verifica se o jogador está dentro do raio de 25m.
+  // Só então permite a entrada no H15.
+  void _clicarPingo() {
+    if (_entrandoNoH15) return;
+
+    final distancia = _calcularDistancia();
+
+    if (distancia <= _distanciaMinimaEntrada) {
+      _entrandoNoH15 = true;
       Navigator.pushReplacementNamed(context, '/h15');
+      return;
     }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Você ainda está longe do Pingo. Aproxime-se! '
+          'Distância: ${distancia.toStringAsFixed(0)}m',
+        ),
+        backgroundColor: Colors.orange,
+      ),
+    );
   }
 
   // ================= 🗺️ ROTA =================
@@ -244,15 +266,18 @@ class _TelaMapaExploracaoState extends State<TelaMapaExploracao> {
                     ),
                   ),
 
-                  // 🐧 DESTINO
+                  // 🐧 DESTINO — clicável dentro do raio de 25m
                   Marker(
                     point: _h15,
                     width: _calcularTamanho(60),
                     height: _calcularTamanho(60),
-                    child: Image.asset(
-                      'assets/personagens/pingo.png',
-                      width: _calcularTamanho(80),
-                      height: _calcularTamanho(80),
+                    child: GestureDetector(
+                      onTap: _clicarPingo,
+                      child: Image.asset(
+                        'assets/personagens/pingo.png',
+                        width: _calcularTamanho(80),
+                        height: _calcularTamanho(80),
+                      ),
                     ),
                   ),
                 ],
@@ -278,7 +303,7 @@ class _TelaMapaExploracaoState extends State<TelaMapaExploracao> {
                     style: TextStyle(color: Colors.white),
                   ),
                   Text(
-                    '🐧 Vá até o Pingo para iniciar o jogo!',
+                    '🐧 Vá até o Pingo e clique nele para iniciar o jogo!',
                     style: TextStyle(color: Colors.cyanAccent),
                   ),
                   Text(

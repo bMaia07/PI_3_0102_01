@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../1-H15/tela_h15.dart';
-import '../4-Arquitetura/arquiteturaOUT.dart';
 import 'creditos.dart';
 import '../game_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,6 +68,7 @@ class _TelaInicialState extends State<TelaInicial> {
 
     await _player.stop();
 
+    // Novo jogo sempre começa pelo mapa de exploração (TelaMapaExploracao).
     Navigator.pushNamed(
       context,
       '/mapa',
@@ -592,8 +592,6 @@ class _TelaInicialState extends State<TelaInicial> {
   // ======================== DIÁLOGOS DE BLOQUEIO ========================
 
   /// Exibe um diálogo genérico de fase bloqueada.
-  /// [nomeFase] = nome exibido no título (ex: "BIBLIOTECA").
-  /// [requisito] = o que o jogador precisa fazer antes (ex: "Conclua o H15 primeiro.").
   void _mostrarFaseBloqueada({
     required String nomeFase,
     required String requisito,
@@ -693,10 +691,10 @@ class _TelaInicialState extends State<TelaInicial> {
     );
   }
 
-  // ======================== MENU DE ESCOLHA DE LOCAL ========================
+  // ======================== MENU DE ESCOLHA DE LOCAL (DEV) ========================
 
-  /// Constrói um botão de fase no menu "ESCOLHA O LOCAL" com suporte a cadeado.
-  /// [desbloqueada] = se false, exibe o cadeado e bloqueia a navegação.
+  /// Menu de desenvolvimento para pular direto para qualquer fase.
+  /// Acessível apenas pelo botão "ESCOLHER LOCAL" que aparece ao lado de CONTINUAR.
   Widget _buildBotaoFase({
     required String texto,
     required bool desbloqueada,
@@ -715,7 +713,6 @@ class _TelaInicialState extends State<TelaInicial> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         decoration: BoxDecoration(
-          // Fundo mais escuro/acinzentado quando bloqueado.
           color: desbloqueada ? Colors.blue[900] : const Color(0xFF1A1A2E),
           border: Border.all(
             color: desbloqueada ? Colors.white : Colors.white30,
@@ -750,7 +747,6 @@ class _TelaInicialState extends State<TelaInicial> {
   }
 
   void _mostrarEscolhaLocal(BuildContext context) async {
-    // Carrega o progresso mais recente antes de exibir o menu.
     await GameProgress.carregar();
 
     if (!mounted) return;
@@ -758,16 +754,10 @@ class _TelaInicialState extends State<TelaInicial> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // ── Regras de desbloqueio progressivo ──────────────────────────────
-        // H15          → sempre disponível (fase inicial)
-        // Biblioteca   → requer h15Concluida
-        // Praça        → requer livroCorujitoEntregue (missão da biblioteca concluída)
-        // Arquitetura  → requer pracaDesbloqueada (= livroCorujitoEntregue)
-        // Manacás      → requer arquiteturaConcluida
-        final bool h15Ok = true; // sempre desbloqueado
+        final bool h15Ok = true;
         final bool bibliotecaOk = GameProgress.h15Concluida;
         final bool pracaOk = GameProgress.pracaDesbloqueada;
-        final bool arquiteturaOk = GameProgress.pracaDesbloqueada; // entra pela praça
+        final bool arquiteturaOk = GameProgress.pracaDesbloqueada;
         final bool manacasOk = GameProgress.manacasDesbloqueada;
 
         return Dialog(
@@ -792,16 +782,6 @@ class _TelaInicialState extends State<TelaInicial> {
                 ),
                 SizedBox(height: 20),
 
-                // TESTAR NOVO JOGO (sem restrição — opção de dev)
-                _buildBotaoPixel("TESTAR NOVO JOGO", () {
-                  Navigator.pop(context);
-                  Future.microtask(() {
-                    _iniciarNovoJogo(this.context);
-                  });
-                }, true),
-                SizedBox(height: 10),
-
-                // H15 — sempre desbloqueado
                 _buildBotaoFase(
                   texto: 'H15 TECNOLOGIA',
                   desbloqueada: h15Ok,
@@ -814,7 +794,6 @@ class _TelaInicialState extends State<TelaInicial> {
                 ),
                 SizedBox(height: 10),
 
-                // BIBLIOTECA — requer H15 concluído
                 _buildBotaoFase(
                   texto: 'BIBLIOTECA',
                   desbloqueada: bibliotecaOk,
@@ -823,12 +802,10 @@ class _TelaInicialState extends State<TelaInicial> {
                     _navegarPara(this.context, '/biblioteca');
                   },
                   nomeFase: 'BIBLIOTECA',
-                  requisito:
-                      'Você precisa concluir o\nprédio H15 primeiro!',
+                  requisito: 'Você precisa concluir o\nprédio H15 primeiro!',
                 ),
                 SizedBox(height: 10),
 
-                // PRAÇA DE ALIMENTAÇÃO — requer missão da biblioteca concluída
                 _buildBotaoFase(
                   texto: 'PRAÇA',
                   desbloqueada: pracaOk,
@@ -842,7 +819,6 @@ class _TelaInicialState extends State<TelaInicial> {
                 ),
                 SizedBox(height: 10),
 
-                // H12 ARQUITETURA — requer praça concluída
                 _buildBotaoFase(
                   texto: 'H12 ARQUITETURA',
                   desbloqueada: arquiteturaOk,
@@ -856,7 +832,6 @@ class _TelaInicialState extends State<TelaInicial> {
                 ),
                 SizedBox(height: 10),
 
-                // MANACÁS — requer arquitetura concluída
                 _buildBotaoFase(
                   texto: 'MANACÁS (CAVE)',
                   desbloqueada: manacasOk,
@@ -968,9 +943,12 @@ class _TelaInicialState extends State<TelaInicial> {
                   ),
                 ),
                 SizedBox(height: 60),
+
+                // NOVO JOGO → vai direto para o mapa de exploração (TelaMapaExploracao).
                 _buildBotaoPixel("NOVO JOGO", () {
-                  _mostrarEscolhaLocal(context);
+                  _iniciarNovoJogo(context);
                 }, false),
+
                 SizedBox(height: 20),
                 _buildBotaoPixel("CONTINUAR", () {
                   _mostrarSavesFirebase(context);

@@ -429,7 +429,7 @@ class _DialogoCorujitoState extends State<_DialogoCorujito> {
     await BibliotecaAudioController.parar();
     if (!mounted) return;
     Navigator.pop(context);
-    Navigator.pushNamed(context, '/refeitorio');
+    Navigator.pushNamed(context, '/TelaMapaPraca');
   }
 
   // Para o áudio da biblioteca e volta para o menu principal.

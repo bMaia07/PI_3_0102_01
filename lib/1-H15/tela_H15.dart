@@ -6,7 +6,7 @@ import 'package:latlong2/latlong.dart';
 import 'dart:html' as html;
 
 import '../game_progress.dart';
-import '../2-Biblioteca/biblioteca_fachada.dart';
+import '../2-Biblioteca/tela_mapa_biblioteca.dart';
 
 class TelaH15 extends StatefulWidget {
   @override
@@ -389,7 +389,7 @@ class _TelaH15State extends State<TelaH15> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              const BibliotecaFachadaScreen(),
+                              const TelaMapaBiblioteca(),
                         ),
                       );
                     },
