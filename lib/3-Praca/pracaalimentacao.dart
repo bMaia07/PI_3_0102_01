@@ -339,7 +339,7 @@ class _TelapracaalimentacaoState
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => TelaMapaArquitetura(),
+                builder: (_) => TelaArquiteturaOUT(),
               ),
             );
 

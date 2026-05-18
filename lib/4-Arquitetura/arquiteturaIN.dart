@@ -6,8 +6,7 @@ import 'miniGameKoda.dart';
 class Dialogo {
   final String texto;
   final String personagem;
-  final String imagem;
-  Dialogo({required this.texto, required this.personagem, required this.imagem});
+  Dialogo({required this.texto, required this.personagem});
 }
 
 class TelaArquiteturaIN extends StatefulWidget {
@@ -16,42 +15,31 @@ class TelaArquiteturaIN extends StatefulWidget {
 }
 
 class _TelaArquiteturaINState extends State<TelaArquiteturaIN> {
-  late VideoPlayerController _videoController;
   late AudioPlayer _musicPlayer;
-  bool _videoInicializado = false;
   bool isMuted = false;
-  String? ultimoPersonagem; // para saber quando o personagem muda
+  int _currentDialogIndex = 0;
+  String _displayedText = '';
+  String _fullText = '';
+  int _charIndex = 0;
+  bool _isTyping = false;
 
-  List<Dialogo> dialogos = [
-    Dialogo(texto: "Ao entrar na sala o jogador vê um coala sobre uma planta arquitetônica...", personagem: "Narrador", imagem: ""),
-    Dialogo(texto: "Ah! Ei, você! Que bom que apareceu... preciso de ajuda...", personagem: "Koda", imagem: ""),
-    Dialogo(texto: "Claro! O que está acontecendo?", personagem: "Jogador", imagem: ""),
-    Dialogo(texto: "Estou com problemas nesse projeto arquitetônico...", personagem: "Koda", imagem: ""),
+  VideoPlayerController? _videoController;
+  bool _videoReady = false;
+
+  List<Dialogo> dialogs = [
+    Dialogo(texto: "Ao entrar na sala o jogador vê um coala sobre uma planta arquitetônica...", personagem: "Narrador"),
+    Dialogo(texto: "Ah! Ei, você! Que bom que apareceu... preciso de ajuda...", personagem: "Koda"),
+    Dialogo(texto: "Claro! O que está acontecendo?", personagem: "Jogador"),
+    Dialogo(texto: "Estou com problemas nesse projeto arquitetônico...", personagem: "Koda"),
   ];
-  int indiceAtual = 0;
-
-  String _textoExibido = '';
-  String _textoCompleto = '';
-  int _indiceChar = 0;
-  bool _digitando = false;
 
   @override
   void initState() {
     super.initState();
-    _inicializarVideo();
-    _inicializarAudio();
+    _initAudio();
   }
 
-  void _inicializarVideo() async {
-    _videoController = VideoPlayerController.asset('assets/videos/coala.mp4');
-    await _videoController.initialize();
-    _videoController.setLooping(true);
-    setState(() {
-      _videoInicializado = true;
-    });
-  }
-
-  void _inicializarAudio() async {
+  void _initAudio() async {
     _musicPlayer = AudioPlayer();
     await _musicPlayer.setReleaseMode(ReleaseMode.loop);
     await _musicPlayer.play(AssetSource('audios/background_music_arq.mp3'));
@@ -63,95 +51,106 @@ class _TelaArquiteturaINState extends State<TelaArquiteturaIN> {
     await _musicPlayer.setVolume(isMuted ? 0 : 0.5);
   }
 
-  void _iniciarDigitacao(String novoTexto) {
+  Future<void> _loadAndPlayVideo() async {
+    // Se já existe um controller, descarta antes de criar outro
+    if (_videoController != null) {
+      await _videoController!.dispose();
+      _videoController = null;
+    }
+    setState(() => _videoReady = false); // esconde o vídeo enquanto carrega
+
+    final controller = VideoPlayerController.asset('assets/videos/coala.mp4');
+    await controller.initialize();
+    controller.setLooping(true);
+    await controller.play();
     setState(() {
-      _textoCompleto = novoTexto;
-      _textoExibido = '';
-      _indiceChar = 0;
-      _digitando = true;
+      _videoController = controller;
+      _videoReady = true;
     });
-    _proximoCaractere();
   }
 
-  void _proximoCaractere() {
-    if (_indiceChar < _textoCompleto.length) {
+  void _stopVideo() {
+    if (_videoController != null && _videoController!.value.isPlaying) {
+      _videoController!.pause();
+    }
+  }
+
+  void _startTyping(String text) {
+    setState(() {
+      _fullText = text;
+      _displayedText = '';
+      _charIndex = 0;
+      _isTyping = true;
+    });
+    _nextChar();
+  }
+
+  void _nextChar() {
+    if (_charIndex < _fullText.length) {
       setState(() {
-        _textoExibido += _textoCompleto[_indiceChar];
-        _indiceChar++;
+        _displayedText += _fullText[_charIndex];
+        _charIndex++;
       });
       Future.delayed(Duration(milliseconds: 35), () {
-        if (mounted) _proximoCaractere();
+        if (mounted) _nextChar();
       });
     } else {
-      setState(() => _digitando = false);
+      setState(() => _isTyping = false);
     }
   }
 
-  void _avancarDialogo() {
-    if (_digitando) {
+  void _nextDialog() async {
+    if (_isTyping) {
       setState(() {
-        _textoExibido = _textoCompleto;
-        _indiceChar = _textoCompleto.length;
-        _digitando = false;
+        _displayedText = _fullText;
+        _charIndex = _fullText.length;
+        _isTyping = false;
       });
-    } else {
-      if (indiceAtual < dialogos.length - 1) {
-        setState(() {
-          indiceAtual++;
-          _textoExibido = '';
-          _textoCompleto = '';
-          _indiceChar = 0;
-          _digitando = false;
-        });
-        _iniciarDigitacao(dialogos[indiceAtual].texto);
-      }
+      return;
     }
-  }
+    if (_currentDialogIndex < dialogs.length - 1) {
+      setState(() {
+        _currentDialogIndex++;
+        _displayedText = '';
+        _fullText = '';
+        _charIndex = 0;
+        _isTyping = false;
+      });
 
-  // Controle do vídeo: reinicia e toca se personagem for Koda, pausa caso contrário
-  void _controlarVideo() {
-    if (!_videoInicializado) return;
-    Dialogo atual = dialogos[indiceAtual];
-    bool ehKoda = atual.personagem == "Koda";
-    if (ehKoda) {
-      if (ultimoPersonagem != "Koda") {
-        _videoController.seekTo(Duration.zero);
-        _videoController.play();
-      } else if (!_videoController.value.isPlaying) {
-        _videoController.play();
+      final newPersonagem = dialogs[_currentDialogIndex].personagem;
+      if (newPersonagem == "Koda") {
+        await _loadAndPlayVideo();
+      } else {
+        _stopVideo();
       }
-    } else {
-      if (_videoController.value.isPlaying) {
-        _videoController.pause();
-      }
+
+      _startTyping(dialogs[_currentDialogIndex].texto);
     }
-    ultimoPersonagem = atual.personagem;
   }
 
   @override
   void dispose() {
-    _videoController.dispose();
     _musicPlayer.dispose();
+    _videoController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    Dialogo atual = dialogos[indiceAtual];
-    bool acabouDialogo = indiceAtual == dialogos.length - 1;
+    Dialogo current = dialogs[_currentDialogIndex];
+    bool isLast = _currentDialogIndex == dialogs.length - 1;
 
-    // Controle do vídeo a cada build
-    _controlarVideo();
-
-    if (_textoCompleto.isEmpty && _textoExibido.isEmpty && atual.texto.isNotEmpty) {
-      _iniciarDigitacao(atual.texto);
+    if (_displayedText.isEmpty && _fullText.isEmpty && current.texto.isNotEmpty) {
+      if (current.personagem == "Koda") {
+        _loadAndPlayVideo();
+      }
+      _startTyping(current.texto);
     }
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Fundo
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -205,8 +204,8 @@ class _TelaArquiteturaINState extends State<TelaArquiteturaIN> {
             ),
           ),
 
-          // Vídeo do Koda (aparece apenas quando a fala é dele)
-          if (_videoInicializado && atual.personagem == "Koda")
+          // Vídeo do Koda – só aparece quando ready e personagem é Koda
+          if (current.personagem == "Koda" && _videoReady && _videoController != null)
             Positioned(
               left: 20,
               bottom: 20,
@@ -222,7 +221,7 @@ class _TelaArquiteturaINState extends State<TelaArquiteturaIN> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: VideoPlayer(_videoController),
+                      child: VideoPlayer(_videoController!),
                     ),
                   ),
                   SizedBox(height: 12),
@@ -231,13 +230,13 @@ class _TelaArquiteturaINState extends State<TelaArquiteturaIN> {
               ),
             ),
 
-          // Caixa de diálogo (à direita)
+          // Caixa de diálogo
           Positioned(
             bottom: 20,
             left: 280,
             right: 20,
             child: GestureDetector(
-              onTap: acabouDialogo ? null : _avancarDialogo,
+              onTap: isLast ? null : _nextDialog,
               child: Container(
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -263,20 +262,20 @@ class _TelaArquiteturaINState extends State<TelaArquiteturaIN> {
                         children: [
                           Icon(Icons.chat_bubble, color: Colors.black, size: 16),
                           SizedBox(width: 8),
-                          Text(atual.personagem.toUpperCase(),
+                          Text(current.personagem.toUpperCase(),
                               style: TextStyle(fontFamily: 'PixelifySans', fontWeight: FontWeight.bold, color: Colors.black, fontSize: 14)),
                         ],
                       ),
                     ),
                     SizedBox(height: 16),
-                    Text(_textoExibido, style: TextStyle(fontFamily: 'PixelifySans', fontSize: 16, color: Colors.white, height: 1.5)),
-                    if (!_digitando && !acabouDialogo)
+                    Text(_displayedText, style: TextStyle(fontFamily: 'PixelifySans', fontSize: 16, color: Colors.white, height: 1.5)),
+                    if (!_isTyping && !isLast)
                       Padding(
                         padding: EdgeInsets.only(top: 12),
                         child: Text('👆 Toque para continuar...',
                             style: TextStyle(fontFamily: 'PixelifySans', fontSize: 11, color: Color(0xFFFFE817).withOpacity(0.7))),
                       ),
-                    if (acabouDialogo)
+                    if (isLast)
                       Center(
                         child: GestureDetector(
                           onTap: () async {

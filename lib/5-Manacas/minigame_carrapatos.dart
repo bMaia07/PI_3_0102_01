@@ -84,12 +84,9 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
 
   void clicarMestre() {
     if (!faseMestre) return;
-    setState(() {
-      cliquesNoMestre++;
-    });
+    setState(() => cliquesNoMestre++);
     if (cliquesNoMestre >= cliquesParaDerrotarMestre) {
       ataqueMestreTimer?.cancel();
-      // Vitória direta, sem exibir imagem de morte aqui
       widget.onGameEnd(true);
     }
   }
@@ -124,7 +121,7 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
                     children: [
                       Image.asset('assets/personagens/manacas/carrapato_mau.png', width: 30, height: 30),
                       SizedBox(width: 8),
-                      Text("$carrapatosRestantes", style: TextStyle(fontSize: 24, color: Colors.cyanAccent, fontFamily: 'PixelifySans')),
+                      Text("$carrapatosRestantes", style: TextStyle(fontSize: 24, color: Colors.white, fontFamily: 'PixelifySans')),
                     ],
                   ),
               ],
@@ -156,15 +153,11 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Image.asset(
-                            'assets/personagens/manacas/carrapatao.png',
-                            width: 250,
-                            height: 250,
-                          ),
+                          Image.asset('assets/personagens/manacas/carrapatao.png', width: 250, height: 250),
                           SizedBox(height: 20),
                           Text(
                             "Cliques: $cliquesNoMestre / $cliquesParaDerrotarMestre",
-                            style: TextStyle(fontFamily: 'PixelifySans', color: Colors.yellow, fontSize: 18),
+                            style: TextStyle(fontFamily: 'PixelifySans', color: Colors.white, fontSize: 18),
                           ),
                           SizedBox(height: 10),
                           Container(
@@ -176,8 +169,10 @@ class _MinigameCarrapatosState extends State<MinigameCarrapatos> {
                             ),
                           ),
                           SizedBox(height: 10),
-                          Text("⚠️ Ele ataca a cada $intervaloAtaqueMestre segundos!",
-                              style: TextStyle(fontFamily: 'PixelifySans', color: Colors.orange)),
+                          Text(
+                            "⚠️ Ele ataca a cada $intervaloAtaqueMestre segundos!",
+                            style: TextStyle(fontFamily: 'PixelifySans', color: Colors.orange),
+                          ),
                         ],
                       ),
                     ),

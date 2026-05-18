@@ -33,9 +33,7 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
   bool isMuted = false;
 
   void toggleMute() async {
-    setState(() {
-      isMuted = !isMuted;
-    });
+    setState(() => isMuted = !isMuted);
     if (isMuted) {
       await pausarMusicaManacas();
     } else {
@@ -47,9 +45,7 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      iniciarMusicaManacas().catchError((e) {
-        print("Autoplay bloqueado.");
-      });
+      iniciarMusicaManacas().catchError((e) => print("Autoplay bloqueado."));
     });
   }
 
@@ -59,7 +55,6 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Fundo
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -70,9 +65,9 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
           ),
           Container(color: Colors.black.withOpacity(0.3)),
 
-          // Botão MUTE
+          // Botão MUTE (cores originais)
           Positioned(
-            top: 50,
+            top: 40,
             right: 20,
             child: GestureDetector(
               onTap: toggleMute,
@@ -81,7 +76,7 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(38, 23, 23, 1),
                   border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   isMuted ? Icons.volume_off : Icons.volume_up,
@@ -92,9 +87,9 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
             ),
           ),
 
-          // Botão VOLTAR
+          // Botão VOLTAR (cores originais)
           Positioned(
-            top: 50,
+            top: 40,
             left: 20,
             child: GestureDetector(
               onTap: () async {
@@ -102,28 +97,26 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
                 if (mounted) Navigator.pop(context);
               },
               child: Container(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(38, 23, 23, 1),
                   border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [BoxShadow(color: Colors.black87, blurRadius: 10, offset: Offset(4, 4))],
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.arrow_back, color: Color.fromRGBO(65, 26, 26, 1), size: 18),
-                    SizedBox(width: 6),
+                    Icon(Icons.arrow_back, color: Colors.white, size: 18),
+                    SizedBox(width: 8),
                     Text('VOLTAR',
-                        style: TextStyle(
-                            fontFamily: 'PixelifySans',
-                            fontSize: 12,
-                            color: Colors.white)),
+                        style: TextStyle(fontFamily: 'PixelifySans', fontSize: 12, color: Colors.white)),
                   ],
                 ),
               ),
             ),
           ),
 
-          // Pegadas (sempre visíveis)
+          // Pegadas
           Positioned(
             bottom: 200,
             right: 650,
@@ -143,9 +136,9 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
             ),
           ),
 
-          // Caixa de diálogo FIXA na parte inferior
+          // Caixa de diálogo fixa (estilo novo com cores originais)
           Positioned(
-            bottom: 30,   // 👈 bem embaixo
+            bottom: 30,
             left: 20,
             right: 20,
             child: Container(
@@ -154,6 +147,7 @@ class _EntradaManacasScreenState extends State<EntradaManacasScreen> {
                 color: Color.fromRGBO(38, 23, 23, 0.95),
                 border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 3),
                 borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: Colors.black87, blurRadius: 15, offset: Offset(6, 6))],
               ),
               child: Text(
                 "🧑‍🦱 Nossa, o que aconteceu aqui?",

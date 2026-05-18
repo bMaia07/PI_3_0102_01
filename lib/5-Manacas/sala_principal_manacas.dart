@@ -23,9 +23,7 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
   bool isMuted = false;
 
   void toggleMute() {
-    setState(() {
-      isMuted = !isMuted;
-    });
+    setState(() => isMuted = !isMuted);
     if (isMuted) {
       pausarMusicaManacas();
     } else {
@@ -54,7 +52,6 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
   }
 
   void concluirCuidados() {
-    // Após terminar os cuidados, volta direto para o menu principal
     pararMusicaManacas();
     Navigator.popUntil(context, (route) => route.isFirst);
   }
@@ -64,8 +61,13 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        title: Text("Derrota!", style: TextStyle(fontFamily: 'PixelifySans')),
-        content: Text(msg, style: TextStyle(fontFamily: 'PixelifySans')),
+        title: Text("Derrota!", style: TextStyle(fontFamily: 'PixelifySans', color: Color.fromRGBO(65, 26, 26, 1))),
+        content: Text(msg, style: TextStyle(fontFamily: 'PixelifySans', color: Colors.white)),
+        backgroundColor: Color.fromRGBO(38, 23, 23, 1),
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Color.fromRGBO(65, 26, 26, 1), width: 2),
+          borderRadius: BorderRadius.circular(10),
+        ),
         actions: [
           TextButton(
             onPressed: () {
@@ -75,11 +77,11 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
                 dialogoPreIndex = 0;
               });
             },
-            child: Text("Reiniciar"),
+            child: Text("Reiniciar", style: TextStyle(color: Color.fromRGBO(65, 26, 26, 1))),
           ),
           TextButton(
             onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
-            child: Text("Sair"),
+            child: Text("Sair", style: TextStyle(color: Color.fromRGBO(65, 26, 26, 1))),
           ),
         ],
       ),
@@ -102,9 +104,9 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
           ),
           Container(color: Colors.black.withOpacity(0.4)),
 
-          // Botão MUTE
+          // Botão MUTE (cores originais)
           Positioned(
-            top: 50,
+            top: 40,
             right: 20,
             child: GestureDetector(
               onTap: toggleMute,
@@ -113,7 +115,7 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(38, 23, 23, 1),
                   border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   isMuted ? Icons.volume_off : Icons.volume_up,
@@ -124,7 +126,7 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
             ),
           ),
 
-          // Imagem da Capivarilda atacada (apenas durante diálogo pré-combate)
+          // Imagem da Capivarilda atacada
           if (faseAtual == Fase.dialogoPre)
             Positioned(
               top: 100,
@@ -139,7 +141,7 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
               ),
             ),
 
-          // Carrapato morto (durante o diálogo de derrota)
+          // Carrapato morto
           if (faseAtual == Fase.dialogoPosCombate)
             Positioned(
               top: 120,
@@ -198,8 +200,12 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
               bottomLeft: Radius.circular(20),
               bottomRight: Radius.circular(8),
             ),
+            boxShadow: [BoxShadow(color: Colors.black87, blurRadius: 15, offset: Offset(6, 6))],
           ),
-          child: Text(texto, style: TextStyle(fontFamily: 'PixelifySans', fontSize: 16, color: Colors.white)),
+          child: Text(
+            texto,
+            style: TextStyle(fontFamily: 'PixelifySans', fontSize: 16, color: Colors.white, height: 1.5),
+          ),
         ),
       ),
     );
@@ -209,17 +215,18 @@ class _SalaPrincipalManacasScreenState extends State<SalaPrincipalManacasScreen>
     return GestureDetector(
       onTap: () => Navigator.pop(context),
       child: Container(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: Color.fromRGBO(38, 23, 23, 1),
           border: Border.all(color: Color.fromRGBO(65, 26, 26, 1), width: 2),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [BoxShadow(color: Colors.black87, blurRadius: 10, offset: Offset(4, 4))],
         ),
         child: Row(
           children: [
-            Icon(Icons.arrow_back, color: Color.fromRGBO(65, 26, 26, 1)),
-            SizedBox(width: 6),
-            Text("VOLTAR", style: TextStyle(fontFamily: 'PixelifySans', color: Colors.white)),
+            Icon(Icons.arrow_back, color: Colors.white, size: 18),
+            SizedBox(width: 8),
+            Text("VOLTAR", style: TextStyle(fontFamily: 'PixelifySans', fontSize: 12, color: Colors.white)),
           ],
         ),
       ),
