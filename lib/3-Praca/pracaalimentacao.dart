@@ -1,3 +1,4 @@
+import 'package:arquivocapivara_app/4-Arquitetura/arquiteturaOUT.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'minigame_pracaalimentacao.dart';
@@ -338,7 +339,7 @@ class _TelapracaalimentacaoState
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const TelaMapaArquitetura(),
+                builder: (_) => TelaMapaArquitetura(),
               ),
             );
 
